@@ -11,14 +11,16 @@ const signToken = (userId, role) => {
   });
 };
 
-const createSendToken = (user, statusCode, res) => {
+const createSendToken = (user, statusCode, req, res) => {
   const token = signToken(user._id, user.role);
+
+  const isProduction = process.env.NODE_ENV === 'production' || req.get('x-forwarded-proto') === 'https';
 
   const cookieOptions = {
     expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
+    secure: isProduction,
+    sameSite: isProduction ? 'none' : 'lax'
   };
 
   res.cookie('elms_token', token, cookieOptions);
@@ -61,7 +63,7 @@ export const login = async (req, res, next) => {
       return res.status(401).json({ success: false, message: 'Incorrect email or password' });
     }
 
-    createSendToken(user, 200, res);
+    createSendToken(user, 200, req, res);
   } catch (error) {
     next(error);
   }
@@ -140,7 +142,7 @@ export const verifyOtp = async (req, res, next) => {
     user.otpAttempts = 0;
     await user.save();
 
-    createSendToken(user, 200, res);
+    createSendToken(user, 200, req, res);
   } catch (error) {
     next(error);
   }
@@ -158,11 +160,13 @@ export const getMe = async (req, res, next) => {
 
 // @route POST /api/auth/logout
 export const logout = (req, res) => {
+  const isProduction = process.env.NODE_ENV === 'production' || req.get('x-forwarded-proto') === 'https';
+
   res.cookie('elms_token', 'loggedout', {
     expires: new Date(Date.now() + 10 * 1000),
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
+    secure: isProduction,
+    sameSite: isProduction ? 'none' : 'lax'
   });
   res.status(200).json({ success: true, message: 'Logged out successfully' });
 };

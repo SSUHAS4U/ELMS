@@ -51,17 +51,18 @@ const server = http.createServer(app);
 
 // CORS configuration - allow multiple origins
 const allowedOrigins = process.env.CLIENT_URL
-  ? process.env.CLIENT_URL.split(',')
-  : ['http://localhost:5173'];
+  ? process.env.CLIENT_URL.split(',').map(url => url.trim())
+  : ['http://localhost:5173', 'https://obsidianelms.netlify.app'];
 
 const corsOptions = {
   origin: function (origin, callback) {
     // Allow requests with no origin (mobile apps, curl, etc.)
     if (!origin) return callback(null, true);
-    // Check if origin is in allowed list
+    // Check if origin is in allowed list or matches a pattern
     if (allowedOrigins.includes(origin) || allowedOrigins.includes('*')) {
       callback(null, true);
     } else {
+      console.warn(`Blocked by CORS: ${origin}`);
       callback(new Error('Not allowed by CORS'));
     }
   },
