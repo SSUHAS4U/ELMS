@@ -35,6 +35,7 @@ export const sendEmail = async ({ email, to, subject, template, templateName, co
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS,
       },
+      family: 4 // Purely forces IPv4 for Nodemailer socket connection
     });
 
     const templatePath = path.join(__dirname, `../email-templates/${tmplName}.hbs`);

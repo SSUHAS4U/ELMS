@@ -42,6 +42,7 @@ dotenv.config({ path: '../.env' });
 connectDB();
 
 const app = express();
+app.set('trust proxy', 1); // Fix for express-rate-limit behind Render Load Balancer
 const server = http.createServer(app);
 
 // CORS configuration - allow multiple origins
