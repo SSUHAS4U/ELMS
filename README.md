@@ -1,7 +1,9 @@
-# Obsidian & Emerald - Employee Leave Management System
+# Obsidian ELMS - Employee Leave Management System
+
+### 🚀 [Access the Live Application](https://obsidianelms.netlify.app/)
 
 ## Overview
-Obsidian & Emerald is a modern, full-stack Employee Leave Management System (ELMS) designed to streamline leave requests, HR approvals, and employee tracking functionality within organizations. 
+Obsidian ELMS is a modern, full-stack Employee Leave Management System (ELMS) designed to streamline leave requests, HR approvals, and employee tracking functionality within organizations. 
 
 ## System Architecture
 
@@ -20,7 +22,7 @@ The application is built using the **MERN** stack (MongoDB, Express, React, Node
 - **Authentication:** JWT (JSON Web Tokens) with OTP-based verification or email-based links.
 - **Key Modules:**
   - `User`, `Department`, `LeaveRequest`, `LeaveType`, `Holiday`, `SwipeRecord`, `AuditLog`, `Notification`
-- **Email Service:** Nodemailer integrated for routing manager/employee status emails via Handlebars (.hbs) email templates.
+- **Email Service:** Powered by **Resend API** for high-reliability OTP delivery and leave notifications via Handlebars (.hbs) email templates.
 
 ### 3. Key Workflows
 1. **Authentication:** Users log in. RBAC ensures access separates between `Employee`, `HR`, and `Admin`.
