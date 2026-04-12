@@ -6,6 +6,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import cookieParser from 'cookie-parser';
+import path from 'path';
 import mongoose from 'mongoose';
 import connectDB from './config/db.js';
 import { apiLimiter } from './middleware/rateLimiter.js';
@@ -35,14 +36,17 @@ import analyticsRoutes from './routes/analyticsRoutes.js';
 import auditLogRoutes from './routes/auditLogRoutes.js';
 import orgSettingsRoutes from './routes/orgSettingsRoutes.js';
 
-// Load env vars
-dotenv.config({ path: '../.env' });
+// Load env vars from root directory
+dotenv.config(); 
+// Fallback to absolute path if parent folder contains .env
+dotenv.config({ path: path.resolve(process.cwd(), '.env') });
+dotenv.config({ path: path.resolve(process.cwd(), '../.env') }); // For cases where it's nested
 
 // Connect DB
 connectDB();
 
 const app = express();
-app.set('trust proxy', 1); // Fix for express-rate-limit behind Render Load Balancer
+app.set('trust proxy', 1); // Essential for express-rate-limit on Render/Load Balancers
 const server = http.createServer(app);
 
 // CORS configuration - allow multiple origins

@@ -11,32 +11,37 @@ dns.setDefaultResultOrder('ipv4first');
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// Security: Sanity check environment variables (Passwords masked)
+const smtpConfigAvailable = !!(process.env.SMTP_USER && process.env.SMTP_PASS);
+console.log(`[Email System] Configuration detected: ${smtpConfigAvailable ? 'READY' : 'MISSING'}`);
+if (smtpConfigAvailable) {
+  console.log(`[Email System] SMTP User: ${process.env.SMTP_USER}`);
+  console.log(`[Email System] SMTP Service: Gmail (Forced IPv4)`);
+}
+
 /**
  * Unified email sender.
- * Accepts: { email, subject, template, context }
- * OR:      { to, subject, templateName, context }
- * This flexibility prevents mismatches between controllers.
  */
 export const sendEmail = async ({ email, to, subject, template, templateName, context }) => {
   const recipient = to || email;
   const tmplName = templateName || template;
 
   if (!recipient || !tmplName) {
-    console.warn('sendEmail called with missing recipient or template name — skipping.');
+    console.warn('[Email System] Missing recipient or template — skipping.');
     return;
   }
 
   try {
     const transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST,
-      port: parseInt(process.env.SMTP_PORT || '587'),
-      secure: process.env.SMTP_PORT === '465',
+      service: 'gmail',
       auth: {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS,
       },
-      family: 4 // Purely forces IPv4 for Nodemailer socket connection
+      family: 4 // Force IPv4 to bypass Render IPv4/IPv6 networking bugs
     });
+
+    console.log(`[Email System] Attempting to send "${subject}" to ${recipient}...`);
 
     const templatePath = path.join(__dirname, `../email-templates/${tmplName}.hbs`);
 
