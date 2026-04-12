@@ -44,16 +44,32 @@ connectDB();
 const app = express();
 const server = http.createServer(app);
 
+// CORS configuration - allow multiple origins
+const allowedOrigins = process.env.CLIENT_URL
+  ? process.env.CLIENT_URL.split(',')
+  : ['http://localhost:5173'];
+
+const corsOptions = {
+  origin: function (origin, callback) {
+    // Allow requests with no origin (mobile apps, curl, etc.)
+    if (!origin) return callback(null, true);
+    // Check if origin is in allowed list
+    if (allowedOrigins.includes(origin) || allowedOrigins.includes('*')) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true
+};
+
 // Configure Socket.io
-const io = new Server(server, { 
-  cors: { 
-    origin: process.env.CLIENT_URL || 'http://localhost:5173', 
-    credentials: true 
-  } 
+const io = new Server(server, {
+  cors: corsOptions
 });
 
 // Middleware
-app.use(cors({ origin: process.env.CLIENT_URL || 'http://localhost:5173', credentials: true }));
+app.use(cors(corsOptions));
 app.use(helmet());
 app.use(morgan('dev'));
 app.use(express.json());
