@@ -160,7 +160,9 @@ export const getMe = async (req, res, next) => {
 export const logout = (req, res) => {
   res.cookie('elms_token', 'loggedout', {
     expires: new Date(Date.now() + 10 * 1000),
-    httpOnly: true
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
   });
   res.status(200).json({ success: true, message: 'Logged out successfully' });
 };
