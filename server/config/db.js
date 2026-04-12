@@ -1,4 +1,7 @@
+import mongoose from 'mongoose';
+import dotenv from 'dotenv';
 import path from 'path';
+
 dotenv.config(); // Fallback to root
 dotenv.config({ path: path.resolve(process.cwd(), '.env') });
 dotenv.config({ path: path.resolve(process.cwd(), '../.env') });
