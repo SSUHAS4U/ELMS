@@ -1,4 +1,5 @@
 # Intermediate / temp files
+node_modules/
 .tmp/
 
 # Environment & credentials
