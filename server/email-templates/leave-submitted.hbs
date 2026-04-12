@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #0A0A0B; color: #F0F0F5; padding: 20px; }
+        .container { max-width: 600px; margin: 0 auto; background-color: #111114; padding: 30px; border-radius: 12px; border: 1px solid #2A2A35; }
+        h2 { color: #00FF87; }
+        p { color: #8888A0; line-height: 1.6; }
+        .highlight { color: #F0F0F5; font-weight: bold; }
+        .button { display: inline-block; padding: 12px 24px; background-color: #00FF87; color: #0A0A0B; text-decoration: none; border-radius: 8px; font-weight: bold; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Leave Request Submitted</h2>
+        <p>Hi <span class="highlight">{{name}}</span>,</p>
+        <p>Your request for <span class="highlight">{{type}} leave</span> from <strong>{{startDate}}</strong> to <strong>{{endDate}}</strong> has been submitted successfully.</p>
+        <p>It is currently pending approval from your manager.</p>
+        <a href="{{appUrl}}/dashboard" class="button">View Dashboard</a>
+    </div>
+</body>
+</html>

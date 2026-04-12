@@ -1,0 +1,96 @@
+import express from 'express';
+import http from 'http';
+import { Server } from 'socket.io';
+import dotenv from 'dotenv';
+import cors from 'cors';
+import helmet from 'helmet';
+import morgan from 'morgan';
+import cookieParser from 'cookie-parser';
+import mongoose from 'mongoose';
+import connectDB from './config/db.js';
+import { apiLimiter } from './middleware/rateLimiter.js';
+import errorHandler from './middleware/errorHandler.js';
+
+// Register all Mongoose models (needed for .populate() to work)
+import './models/User.js';
+import './models/Department.js';
+import './models/LeaveRequest.js';
+import './models/LeaveType.js';
+import './models/Holiday.js';
+import './models/SwipeRecord.js';
+import './models/Notification.js';
+import './models/AuditLog.js';
+import './models/OrganizationSetting.js';
+
+// Route Imports
+import authRoutes from './routes/authRoutes.js';
+import userRoutes from './routes/userRoutes.js';
+import leaveRoutes from './routes/leaveRoutes.js';
+import leaveTypeRoutes from './routes/leaveTypeRoutes.js';
+import departmentRoutes from './routes/departmentRoutes.js';
+import swipeRoutes from './routes/swipeRoutes.js';
+import holidayRoutes from './routes/holidayRoutes.js';
+import notificationRoutes from './routes/notificationRoutes.js';
+import analyticsRoutes from './routes/analyticsRoutes.js';
+import auditLogRoutes from './routes/auditLogRoutes.js';
+import orgSettingsRoutes from './routes/orgSettingsRoutes.js';
+
+// Load env vars
+dotenv.config({ path: '../.env' });
+
+// Connect DB
+connectDB();
+
+const app = express();
+const server = http.createServer(app);
+
+// Configure Socket.io
+const io = new Server(server, { 
+  cors: { 
+    origin: process.env.CLIENT_URL || 'http://localhost:5173', 
+    credentials: true 
+  } 
+});
+
+// Middleware
+app.use(cors({ origin: process.env.CLIENT_URL || 'http://localhost:5173', credentials: true }));
+app.use(helmet());
+app.use(morgan('dev'));
+app.use(express.json());
+app.use(cookieParser()); // Initialize cookie parser for HttpOnly JWT reading
+
+// Inject io into every request
+app.use((req, res, next) => { 
+  req.io = io; 
+  next(); 
+});
+
+// Global API rate limiting
+app.use('/api/', apiLimiter);
+
+// Mount native Express Routes
+app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/leaves', leaveRoutes);
+app.use('/api/leave-types', leaveTypeRoutes);
+app.use('/api/departments', departmentRoutes);
+app.use('/api/swipe', swipeRoutes);
+app.use('/api/holidays', holidayRoutes);
+app.use('/api/notifications', notificationRoutes);
+app.use('/api/analytics', analyticsRoutes);
+app.use('/api/audit-log', auditLogRoutes);
+app.use('/api/org', orgSettingsRoutes);
+
+// Socket logic
+io.on('connection', (socket) => {
+  console.log('Client connected:', socket.id);
+  socket.on('disconnect', () => console.log('Client disconnected:', socket.id));
+});
+
+// Centralized error handling
+app.use(errorHandler);
+
+const PORT = process.env.PORT || 5000;
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => server.listen(PORT, () => console.log(`Server & Socket.io native running on port ${PORT}`)))
+  .catch(err => console.error('MongoDB boot config err:', err));

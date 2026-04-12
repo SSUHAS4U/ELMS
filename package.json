@@ -1,0 +1,17 @@
+{
+  "name": "elms-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Obsidian & Emerald — Employee Leave Management System",
+  "scripts": {
+    "dev": "concurrently -n client,server -c \"#00FF87,#7B61FF\" \"npm run dev:client\" \"npm run dev:server\"",
+    "dev:client": "cd client && npm run dev",
+    "dev:server": "cd server && npm run dev",
+    "install:all": "npm install && cd client && npm install && cd ../server && npm install",
+    "build": "cd client && npm run build",
+    "lint": "cd client && npm run lint"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}

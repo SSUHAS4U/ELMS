@@ -1,0 +1,23 @@
+{
+  "skill_name": "brand-scraper",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I need to rebuild our marketing site and want to match Stripe's visual style. Can you pull all the design data from stripe.com — their colors, fonts, button styles, that kind of thing?",
+      "expected_output": "brand_profile.json with Stripe's color palette, Inter font family, button component styles. screenshot.png showing the full page. summary.md with a readable overview.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Scrape https://linear.app and give me everything I need to replicate their dark-mode design — the exact colors, typography, any cool effects they use.",
+      "expected_output": "brand_profile.json with colorScheme='dark', dark background colors, Linear's font stack. design_analysis.json capturing their subtle animations and glassmorphism effects.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "I'm designing a brand guide for a client. Pull the brand assets from their current site at vercel.com — logo, colors, fonts, the works. I need it all in one place.",
+      "expected_output": "Complete output directory with brand_profile.json, design_analysis.json, summary.md, downloaded logo, favicon, og_image, and screenshots.",
+      "files": []
+    }
+  ]
+}
