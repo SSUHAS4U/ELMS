@@ -10,3 +10,15 @@ token.json
 __pycache__/
 *.pyc
 .venv/
+
+# Directories not for production (development/research only)
+directives/
+execution/
+brand-scraper/
+skill-creator/
+frontend-design/
+elms_references/
+
+# Large documentation
+*.docx
+*.md
