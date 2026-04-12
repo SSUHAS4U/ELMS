@@ -46,13 +46,16 @@ dotenv.config({ path: path.resolve(process.cwd(), '../.env') }); // For cases wh
 connectDB();
 
 const app = express();
-app.set('trust proxy', 1); // Essential for express-rate-limit on Render/Load Balancers
+app.set('trust proxy', true); // Essential for Render/Load Balancers to properly detect https protocol
 const server = http.createServer(app);
 
 // CORS configuration - allow multiple origins
-const allowedOrigins = process.env.CLIENT_URL
-  ? process.env.CLIENT_URL.split(',').map(url => url.trim())
-  : ['http://localhost:5173', 'https://obsidianelms.netlify.app'];
+const envOrigins = process.env.CLIENT_URL ? process.env.CLIENT_URL.split(',').map(url => url.trim()) : [];
+const allowedOrigins = [
+  'http://localhost:5173',
+  'https://obsidianelms.netlify.app',
+  ...envOrigins
+];
 
 const corsOptions = {
   origin: function (origin, callback) {

@@ -14,13 +14,14 @@ const signToken = (userId, role) => {
 const createSendToken = (user, statusCode, req, res) => {
   const token = signToken(user._id, user.role);
 
-  const isProduction = process.env.NODE_ENV === 'production' || req.get('x-forwarded-proto') === 'https';
+  // Robust detection for secure connection (works with trust proxy)
+  const isSecure = req.secure || req.protocol === 'https' || req.get('x-forwarded-proto') === 'https';
 
   const cookieOptions = {
     expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
     httpOnly: true,
-    secure: isProduction,
-    sameSite: isProduction ? 'none' : 'lax'
+    secure: isSecure,
+    sameSite: isSecure ? 'none' : 'lax'
   };
 
   res.cookie('elms_token', token, cookieOptions);
@@ -160,13 +161,13 @@ export const getMe = async (req, res, next) => {
 
 // @route POST /api/auth/logout
 export const logout = (req, res) => {
-  const isProduction = process.env.NODE_ENV === 'production' || req.get('x-forwarded-proto') === 'https';
+  const isSecure = req.secure || req.protocol === 'https' || req.get('x-forwarded-proto') === 'https';
 
   res.cookie('elms_token', 'loggedout', {
     expires: new Date(Date.now() + 10 * 1000),
     httpOnly: true,
-    secure: isProduction,
-    sameSite: isProduction ? 'none' : 'lax'
+    secure: isSecure,
+    sameSite: isSecure ? 'none' : 'lax'
   });
   res.status(200).json({ success: true, message: 'Logged out successfully' });
 };
