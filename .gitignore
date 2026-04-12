@@ -1,0 +1,33 @@
+# Intermediate / temp files
+.tmp/
+
+# Environment & credentials
+.env
+credentials.json
+token.json
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Directories not for production (development/research only)
+directives/
+execution/
+brand-scraper/
+skill-creator/
+frontend-design/
+elms_references/
+
+# Large documentation
+*.docx
+
+# Keep README.md files
+!CLAUDE.md
+!AGENTS.md
+!README.md
+!directives/README.md
+!execution/README.md
+!client/README.md
+node_modules/
+docs/
