@@ -13,10 +13,21 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [otp, setOtp] = useState('');
   const [otpSent, setOtpSent] = useState(false);
+  const [resendTimer, setResendTimer] = useState(0);
   
   const navigate = useNavigate();
   const { loginWithPassword, sendOtp, loginWithOtp, loading, error } = useAuthStore();
   const { theme, toggle } = useThemeStore();
+
+  useEffect(() => {
+    let interval;
+    if (resendTimer > 0) {
+      interval = setInterval(() => {
+        setResendTimer((prev) => prev - 1);
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [resendTimer]);
 
   const handlePasswordLogin = async (e) => {
     e.preventDefault();
@@ -30,7 +41,17 @@ const Login = () => {
     const success = await sendOtp(email);
     if (success) {
       setOtpSent(true);
+      setResendTimer(60);
       toast.success('OTP sent securely to your email!');
+    }
+  };
+
+  const handleResendOtp = async () => {
+    if (resendTimer > 0 || !email) return;
+    const success = await sendOtp(email);
+    if (success) {
+      setResendTimer(60);
+      toast.success('New OTP sent to your email!');
     }
   };
 
@@ -154,6 +175,19 @@ const Login = () => {
                   {loading ? <Loader2 className="animate-spin h-5 w-5" /> : (otpSent ? 'Verify Code' : 'Send Code')}
                   {!loading && <ArrowRight className="ml-2 h-4 w-4" />}
                 </button>
+
+                {otpSent && (
+                  <div className="text-center mt-4">
+                    <button
+                      type="button"
+                      disabled={loading || resendTimer > 0}
+                      onClick={handleResendOtp}
+                      className="text-sm font-medium text-[color:var(--text-secondary)] hover:text-[color:var(--accent-primary)] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    >
+                      {resendTimer > 0 ? `Resend code in ${resendTimer}s` : "Didn't receive the code? Resend"}
+                    </button>
+                  </div>
+                )}
               </motion.form>
             )}
           </AnimatePresence>
