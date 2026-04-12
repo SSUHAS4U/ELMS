@@ -22,9 +22,7 @@ elms_references/
 # Large documentation
 *.docx
 
-# Keep README.md files
-!CLAUDE.md
-!AGENTS.md
+*.md
 !README.md
 !directives/README.md
 !execution/README.md
