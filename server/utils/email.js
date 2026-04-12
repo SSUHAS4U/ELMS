@@ -16,7 +16,8 @@ const smtpConfigAvailable = !!(process.env.SMTP_USER && process.env.SMTP_PASS);
 console.log(`[Email System] Configuration detected: ${smtpConfigAvailable ? 'READY' : 'MISSING'}`);
 if (smtpConfigAvailable) {
   console.log(`[Email System] SMTP User: ${process.env.SMTP_USER}`);
-  console.log(`[Email System] SMTP Service: Gmail (Forced IPv4)`);
+  console.log(`[Email System] SMTP Pass Length: ${process.env.SMTP_PASS.length}`);
+  console.log(`[Email System] SMTP Service: Gmail (Forced IPv4, Debug ON)`);
 }
 
 /**
@@ -32,13 +33,21 @@ export const sendEmail = async ({ email, to, subject, template, templateName, co
   }
 
   try {
+    // We use explicit host/port here with Debugging to see the handshake
     const transporter = nodemailer.createTransport({
-      service: 'gmail',
+      host: 'smtp.gmail.com',
+      port: 465,
+      secure: true, // Use SSL/TLS directly on port 465
       auth: {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS,
       },
-      family: 4 // Force IPv4 to bypass Render IPv4/IPv6 networking bugs
+      family: 4, // Force IPv4
+      debug: true, // Output SMTP traffic to console
+      logger: true, // Log information to console
+      connectionTimeout: 15000, // 15s timeout
+      greetingTimeout: 15000, 
+      socketTimeout: 15000
     });
 
     console.log(`[Email System] Attempting to send "${subject}" to ${recipient}...`);
