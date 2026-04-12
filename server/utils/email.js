@@ -1,27 +1,19 @@
-import nodemailer from 'nodemailer';
 import fs from 'fs';
 import path from 'path';
 import handlebars from 'handlebars';
 import { fileURLToPath } from 'url';
-import dns from 'dns';
-
-// Fix for Render / Node 18+ preferring IPv6 and crashing (ENETUNREACH)
-dns.setDefaultResultOrder('ipv4first');
+import https from 'https';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Security: Sanity check environment variables (Passwords masked)
-const smtpConfigAvailable = !!(process.env.SMTP_USER && process.env.SMTP_PASS);
-console.log(`[Email System] Configuration detected: ${smtpConfigAvailable ? 'READY' : 'MISSING'}`);
-if (smtpConfigAvailable) {
-  console.log(`[Email System] SMTP User: ${process.env.SMTP_USER}`);
-  console.log(`[Email System] SMTP Pass Length: ${process.env.SMTP_PASS.length}`);
-  console.log(`[Email System] SMTP Service: Gmail (Forced IPv4, Debug ON)`);
-}
+// Security: Sanity check environment variables
+const resendApiKey = process.env.RESEND_API_KEY;
+console.log(`[Email System] Resend API: ${resendApiKey ? 'CONFIGURED' : 'MISSING'}`);
 
 /**
- * Unified email sender.
+ * Unified email sender using Resend HTTP API.
+ * Bypasses Render's SMTP port blocking.
  */
 export const sendEmail = async ({ email, to, subject, template, templateName, context }) => {
   const recipient = to || email;
@@ -32,55 +24,64 @@ export const sendEmail = async ({ email, to, subject, template, templateName, co
     return;
   }
 
-  try {
-    // We use explicit host/port here with Debugging to see the handshake
-    const transporter = nodemailer.createTransport({
-      host: 'smtp.gmail.com',
-      port: 465,
-      secure: true, // Use SSL/TLS directly on port 465
-      auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
-      },
-      family: 4, // Force IPv4
-      debug: true, // Output SMTP traffic to console
-      logger: true, // Log information to console
-      connectionTimeout: 15000, // 15s timeout
-      greetingTimeout: 15000, 
-      socketTimeout: 15000
+  // 1. Prepare HTML Content
+  const templatePath = path.join(__dirname, `../email-templates/${tmplName}.hbs`);
+  let html;
+  if (fs.existsSync(templatePath)) {
+    const source = fs.readFileSync(templatePath, 'utf-8');
+    const compiled = handlebars.compile(source);
+    html = compiled(context || {});
+  } else {
+    html = `<div style="font-family:sans-serif;padding:24px;">
+      <h2 style="color:#00C96B;">${subject}</h2>
+      <pre style="background:#f5f5f5;padding:16px;border-radius:8px;">${JSON.stringify(context, null, 2)}</pre>
+      <p style="color:#888;margin-top:16px;">— Obsidian ELMS</p>
+    </div>`;
+  }
+
+  // 2. Send via Resend HTTP API
+  return new Promise((resolve, reject) => {
+    const data = JSON.stringify({
+      from: 'Obsidian ELMS <onboarding@resend.dev>',
+      to: [recipient],
+      subject: subject,
+      html: html
     });
 
-    console.log(`[Email System] Attempting to send "${subject}" to ${recipient}...`);
-
-    const templatePath = path.join(__dirname, `../email-templates/${tmplName}.hbs`);
-
-    let html;
-    if (fs.existsSync(templatePath)) {
-      const source = fs.readFileSync(templatePath, 'utf-8');
-      const compiled = handlebars.compile(source);
-      html = compiled(context || {});
-    } else {
-      // Fallback: generate simple HTML from context so emails still go out
-      console.warn(`Template "${tmplName}.hbs" not found — using plain fallback.`);
-      html = `<div style="font-family:sans-serif;padding:24px;">
-        <h2 style="color:#00C96B;">${subject}</h2>
-        <pre style="background:#f5f5f5;padding:16px;border-radius:8px;">${JSON.stringify(context, null, 2)}</pre>
-        <p style="color:#888;margin-top:16px;">— Obsidian ELMS</p>
-      </div>`;
-    }
-
-    const mailOptions = {
-      from: `"Obsidian ELMS" <${process.env.SMTP_FROM || process.env.SMTP_USER}>`,
-      to: recipient,
-      subject,
-      html,
+    const options = {
+      hostname: 'api.resend.com',
+      port: 443,
+      path: '/emails',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${resendApiKey}`,
+        'Content-Length': data.length
+      }
     };
 
-    const info = await transporter.sendMail(mailOptions);
-    console.log(`Email sent: ${info.messageId}`);
-    return info;
-  } catch (error) {
-    // Log but never throw — email failure should never crash the main operation
-    console.error(`Email sending failed: ${error.message}`);
-  }
+    console.log(`[Email System] Firing HTTP API request to Resend for: ${recipient}`);
+
+    const req = https.request(options, (res) => {
+      let responseData = '';
+      res.on('data', (chunk) => { responseData += chunk; });
+      res.on('end', () => {
+        if (res.statusCode >= 200 && res.statusCode < 300) {
+          console.log(`[Email System] Success! Rocket sent via API. ID: ${JSON.parse(responseData).id}`);
+          resolve(JSON.parse(responseData));
+        } else {
+          console.error(`[Email System] Resend API Error (${res.statusCode}): ${responseData}`);
+          resolve(null); // Resolve to null so app doesn't crash
+        }
+      });
+    });
+
+    req.on('error', (error) => {
+      console.error(`[Email System] Network Error: ${error.message}`);
+      resolve(null);
+    });
+
+    req.write(data);
+    req.end();
+  });
 };
