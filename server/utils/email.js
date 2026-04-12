@@ -3,6 +3,10 @@ import fs from 'fs';
 import path from 'path';
 import handlebars from 'handlebars';
 import { fileURLToPath } from 'url';
+import dns from 'dns';
+
+// Fix for Render / Node 18+ preferring IPv6 and crashing (ENETUNREACH)
+dns.setDefaultResultOrder('ipv4first');
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
