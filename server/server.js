@@ -38,6 +38,12 @@ import orgSettingsRoutes from './routes/orgSettingsRoutes.js';
 
 // Load env vars from root directory
 dotenv.config(); 
+// Fallback to absolute path if parent folder contains .env
+dotenv.config({ path: path.resolve(process.cwd(), '.env') });
+dotenv.config({ path: path.resolve(process.cwd(), '../.env') }); // For cases where it's nested
+
+// Connect DB
+// connectDB() was removed here to optimize startup as it is called at the end
 
 const app = express();
 app.set('trust proxy', true); // Essential for Render/Load Balancers to properly detect https protocol
