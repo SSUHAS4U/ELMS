@@ -8,10 +8,14 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Security: Sanity check environment variables
-const brevoApiKey = process.env.BREVO_API_KEY;
-const senderEmail = process.env.BREVO_SENDER_EMAIL || 'notif.elms@gmail.com'; 
+const brevoApiKey = process.env.BREVO_API_KEY?.trim();
+const senderEmail = process.env.BREVO_SENDER_EMAIL?.trim() || 'notif.elms@gmail.com'; 
 
-console.log(`[Email System] Brevo API Status: ${brevoApiKey ? 'CONFIGURED' : 'MISSING (Check .env)'}`);
+if (!brevoApiKey) {
+  console.warn('[Email System] BREVO_API_KEY is missing from environment variables!');
+} else {
+  console.log(`[Email System] Brevo API status: CONFIGURED (Key length: ${brevoApiKey.length})`);
+}
 
 /**
  * Unified email sender using Brevo v3 HTTP API.

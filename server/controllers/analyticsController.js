@@ -61,7 +61,7 @@ export const getDepartmentStats = async (req, res, next) => {
           as: 'dept'
         }
       },
-      { $unwind: { path: '$dept', preserveNullAndEmpty: true } },
+      { $unwind: { path: '$dept', preserveNullAndEmptyArrays: true } },
       { 
         $project: { 
           _id: 0, 
@@ -197,7 +197,7 @@ export const getAttendanceRate = async (req, res, next) => {
           as: 'user'
         }
       },
-      { $unwind: { path: '$user', preserveNullAndEmpty: true } },
+      { $unwind: { path: '$user', preserveNullAndEmptyArrays: true } },
       {
         $group: {
           _id: { $ifNull: ['$user.department', 'unassigned'] },
@@ -212,7 +212,7 @@ export const getAttendanceRate = async (req, res, next) => {
           as: 'dept'
         }
       },
-      { $unwind: { path: '$dept', preserveNullAndEmpty: true } },
+      { $unwind: { path: '$dept', preserveNullAndEmptyArrays: true } },
       {
         $project: {
           _id: 0,
