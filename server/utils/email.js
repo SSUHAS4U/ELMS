@@ -63,7 +63,7 @@ export const sendEmail = async ({ email, to, subject, template, templateName, co
         'accept': 'application/json',
         'api-key': brevoApiKey,
         'content-type': 'application/json',
-        'content-length': data.length
+        'content-length': Buffer.byteLength(data)
       }
     };
 
