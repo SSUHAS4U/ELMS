@@ -68,7 +68,11 @@ const corsOptions = {
 
 // Configure Socket.io
 const io = new Server(server, {
-  cors: corsOptions
+  cors: corsOptions,
+  transports: ['polling', 'websocket'], // Force polling first for better compatibility, then upgrade
+  allowEIO3: true,
+  pingTimeout: 60000,
+  pingInterval: 25000
 });
 
 // Middleware

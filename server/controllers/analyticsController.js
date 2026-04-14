@@ -46,8 +46,13 @@ export const getSummary = async (req, res, next) => {
 export const getDepartmentStats = async (req, res, next) => {
   try {
     const stats = await User.aggregate([
-      { $match: { role: 'employee', isActive: true, department: { $exists: true, $ne: null } } },
-      { $group: { _id: '$department', count: { $sum: 1 } } },
+      { $match: { role: 'employee', isActive: true } },
+      { 
+        $group: { 
+          _id: { $ifNull: ['$department', 'unassigned'] }, 
+          count: { $sum: 1 } 
+        } 
+      },
       {
         $lookup: {
           from: 'departments',
@@ -56,13 +61,20 @@ export const getDepartmentStats = async (req, res, next) => {
           as: 'dept'
         }
       },
-      { $unwind: { path: '$dept', preserveNullAndEmpty: false } },
-      { $project: { _id: 0, name: '$dept.name', count: 1 } },
+      { $unwind: { path: '$dept', preserveNullAndEmpty: true } },
+      { 
+        $project: { 
+          _id: 0, 
+          name: { $ifNull: ['$dept.name', 'Unassigned'] }, 
+          count: 1 
+        } 
+      },
       { $sort: { count: -1 } }
     ]);
 
     res.status(200).json({ success: true, data: stats });
   } catch (error) {
+    console.error('[Analytics] Department Stats Error:', error);
     next(error);
   }
 };
@@ -168,7 +180,10 @@ export const getAttendanceRate = async (req, res, next) => {
           _id: '$employee',
           presentDays: {
             $sum: {
-              $cond: [{ $eq: ['$status', 'present'] }, 1, { $cond: [{ $eq: ['$status', 'half_day'] }, 0.5, 0] }]
+              $cond: [
+                { $eq: ['$status', 'present'] }, 1, 
+                { $cond: [{ $eq: ['$status', 'half_day'] }, 0.5, 0] }
+              ]
             }
           }
         }
@@ -181,10 +196,10 @@ export const getAttendanceRate = async (req, res, next) => {
           as: 'user'
         }
       },
-      { $unwind: '$user' },
+      { $unwind: { path: '$user', preserveNullAndEmpty: true } },
       {
         $group: {
-          _id: '$user.department',
+          _id: { $ifNull: ['$user.department', 'unassigned'] },
           avgPresentDays: { $avg: '$presentDays' }
         }
       },
@@ -202,7 +217,15 @@ export const getAttendanceRate = async (req, res, next) => {
           _id: 0,
           department: { $ifNull: ['$dept.name', 'Unassigned'] },
           rate: {
-            $round: [{ $multiply: [{ $divide: ['$avgPresentDays', workingDays] }, 100] }, 1]
+            $round: [
+              { 
+                $multiply: [
+                  { $divide: [{ $ifNull: ['$avgPresentDays', 0] }, workingDays] }, 
+                  100
+                ] 
+              }, 
+              1
+            ]
           }
         }
       },
@@ -211,6 +234,7 @@ export const getAttendanceRate = async (req, res, next) => {
 
     res.status(200).json({ success: true, workingDays, data: stats });
   } catch (error) {
+    console.error('[Analytics] Attendance Rate Error:', error);
     next(error);
   }
 };

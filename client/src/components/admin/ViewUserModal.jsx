@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, User as UserIcon, Building2, Mail, Hash, ShieldCheck, CalendarRange, Trash2, AlertTriangle, Loader2 } from 'lucide-react';
@@ -8,6 +8,14 @@ import api from '../../lib/api';
 const ViewUserModal = ({ isOpen, onClose, user, onSuccess }) => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
+
+  // Reset state when modal is closed or user changes
+  useEffect(() => {
+    if (!isOpen) {
+      setConfirmDelete(false);
+      setIsDeleting(false);
+    }
+  }, [isOpen, user?._id]);
 
   if (!isOpen || !user) return null;
 
