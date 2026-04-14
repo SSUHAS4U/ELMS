@@ -1,9 +1,29 @@
+import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, User as UserIcon, Building2, Mail, Hash, ShieldCheck, CalendarRange } from 'lucide-react';
+import { X, User as UserIcon, Building2, Mail, Hash, ShieldCheck, CalendarRange, Trash2, AlertTriangle, Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
+import api from '../../lib/api';
 
-const ViewUserModal = ({ isOpen, onClose, user }) => {
+const ViewUserModal = ({ isOpen, onClose, user, onSuccess }) => {
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+
   if (!isOpen || !user) return null;
+
+  const handleDelete = async () => {
+    try {
+      setIsDeleting(true);
+      await api.delete(`/users/${user._id}/permanent`);
+      toast.success('User permanently deleted');
+      onSuccess?.();
+      onClose();
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Deletion failed');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   const DetailRow = ({ icon: Icon, label, value }) => (
     <div className="flex items-center gap-3 p-3 rounded-lg hover:bg-[color:var(--bg-overlay)] transition-colors border border-transparent hover:border-[color:var(--border-subtle)]/50">
@@ -60,12 +80,56 @@ const ViewUserModal = ({ isOpen, onClose, user }) => {
             <h2 className="text-xl font-bold text-[color:var(--text-primary)]">{user.name}</h2>
             <p className="text-sm text-[color:var(--text-secondary)] mb-6 capitalize leading-relaxed">{window.location.host} · {user.role} Account</p>
             
-            <div className="space-y-2">
+            <div className="space-y-2 mb-8">
               <DetailRow icon={Mail} label="Contact Email" value={user.email} />
               <DetailRow icon={Hash} label="Employee ID" value={user.employeeId} />
               <DetailRow icon={ShieldCheck} label="System Role" value={<span className="capitalize">{user.role}</span>} />
               <DetailRow icon={Building2} label="Department" value={user.department?.name || 'Unassigned'} />
               <DetailRow icon={CalendarRange} label="Joined On" value={new Date(user.createdAt).toLocaleDateString('en-GB')} />
+            </div>
+
+            {/* Admin Actions */}
+            <div className="pt-6 border-t border-[color:var(--border-subtle)] space-y-3">
+              {!confirmDelete ? (
+                <button 
+                  onClick={() => setConfirmDelete(true)}
+                  className="w-full flex items-center justify-center gap-2 py-2 text-sm font-semibold text-[color:var(--danger)] hover:bg-[color:var(--danger)]/10 rounded-lg transition-colors border border-transparent hover:border-[color:var(--danger)]/20"
+                >
+                  <Trash2 className="w-4 h-4" />
+                  Request Account Deletion
+                </button>
+              ) : (
+                <motion.div 
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="p-4 bg-[color:var(--danger)]/5 border border-[color:var(--danger)]/20 rounded-xl"
+                >
+                  <div className="flex items-start gap-3 mb-4">
+                    <div className="mt-0.5 p-1.5 bg-[color:var(--danger)]/10 text-[color:var(--danger)] rounded-lg">
+                      <AlertTriangle className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-[color:var(--text-primary)]">Are you absolutely sure?</p>
+                      <p className="text-xs text-[color:var(--text-secondary)] leading-relaxed mt-1">This action is permanent and cannot be undone. All user data, credentials, and records will be purged.</p>
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <button 
+                      onClick={handleDelete}
+                      disabled={isDeleting}
+                      className="flex-1 py-2 bg-[color:var(--danger)] text-white text-xs font-bold rounded-lg hover:bg-[color:var(--danger)]/90 transition-colors shadow-sm disabled:opacity-50"
+                    >
+                      {isDeleting ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : 'Confirm Deletion'}
+                    </button>
+                    <button 
+                      onClick={() => setConfirmDelete(false)}
+                      className="flex-1 py-2 bg-[color:var(--bg-elevated)] border border-[color:var(--border-subtle)] text-[color:var(--text-secondary)] text-xs font-bold rounded-lg hover:text-[color:var(--text-primary)] transition-colors"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </motion.div>
+              )}
             </div>
           </div>
 

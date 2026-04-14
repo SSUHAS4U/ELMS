@@ -148,3 +148,22 @@ export const updateUser = async (req, res, next) => {
     next(error);
   }
 };
+
+// @route DELETE /api/users/:id/permanent (Admin Only) -> Hard Delete
+export const hardDeleteUser = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ success: false, message: 'User not found' });
+    
+    // Safety: Prevent deleting the super-admin or self via this endpoint without extra care
+    if (user.role === 'admin' && user.email === 'admin@elms.com') {
+      return res.status(403).json({ success: false, message: 'System administrator cannot be deleted.' });
+    }
+
+    await User.findByIdAndDelete(req.params.id);
+
+    res.status(200).json({ success: true, message: 'User permanently removed from database' });
+  } catch (error) {
+    next(error);
+  }
+};

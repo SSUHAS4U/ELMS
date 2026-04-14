@@ -205,6 +205,7 @@ const UserManagement = () => {
         isOpen={viewModalOpen} 
         onClose={() => { setViewModalOpen(false); setUserToView(null); }} 
         user={userToView} 
+        onSuccess={fetchUsers}
       />
     </div>
   );
