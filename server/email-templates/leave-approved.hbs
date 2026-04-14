@@ -1,10 +1,49 @@
-<div style="font-family:'Segoe UI',sans-serif;max-width:480px;margin:0 auto;padding:32px;background:#0A0A0B;border-radius:12px;border:1px solid #2A2A35;">
-  <div style="text-align:center;margin-bottom:24px;">
-    <div style="display:inline-block;width:40px;height:40px;background:#00FF87;border-radius:8px;"></div>
-    <h1 style="color:#00C96B;font-size:22px;margin:16px 0 4px;">Leave Approved ✓</h1>
+<div style="font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 550px; margin: 0 auto; padding: 40px; background-color: #0A0A0B; color: #F0F0F5; border-radius: 20px; border: 1px solid #1A1A1E; box-shadow: 0 15px 40px rgba(0,0,0,0.6);">
+  <div style="text-align: center; margin-bottom: 32px;">
+    <div style="display: inline-block; width: 48px; height: 48px; background: #00FF87; border-radius: 12px; margin-bottom: 16px; line-height: 48px; font-size: 24px;">✅</div>
+    <h1 style="color: #FFFFFF; font-size: 24px; font-weight: 800; margin: 0; letter-spacing: -0.01em;">Request Approved</h1>
+    <p style="color: #8888A0; font-size: 14px; margin-top: 4px; font-weight: 500;">Obsidian Workflow Finalization</p>
   </div>
-  <div style="background:#111114;border:1px solid #2A2A35;border-radius:8px;padding:24px;margin:24px 0;">
-    <p style="color:#F0F0F5;font-size:14px;margin:0 0 8px;">Your leave for <strong style="color:#00FF87;">{{dates}}</strong> has been approved.</p>
-    {{#if note}}<p style="color:#8888A0;font-size:13px;margin:12px 0 0;">Note: {{note}}</p>{{/if}}
+
+  <div style="background-color: #111114; border: 1px solid #1F1F24; border-radius: 14px; padding: 32px; margin-bottom: 32px;">
+    <p style="color: #F0F0F5; font-size: 15px; margin: 0 0 16px; font-weight: 500;">Great news, <strong>{{name}}</strong>!</p>
+    <p style="color: #8888A0; font-size: 14px; line-height: 1.6; margin: 0 0 24px;">Your leave request has been officially approved. Your organizational status will be updated automatically for the following period:</p>
+    
+    <div style="background: #0A0A0B; padding: 20px; border-radius: 12px; border-left: 4px solid #00FF87; margin-bottom: 24px;">
+      <table style="width: 100%; border-collapse: collapse;">
+        <tr>
+          <td style="color: #5D5D6D; padding-bottom: 8px; font-size: 13px;">Classification</td>
+          <td style="color: #FFFFFF; padding-bottom: 8px; font-size: 13px; font-weight: 700; text-align: right; text-transform: capitalize;">{{type}} Leave</td>
+        </tr>
+        <tr>
+          <td style="color: #5D5D6D; padding-bottom: 8px; font-size: 13px;">Approved Range</td>
+          <td style="color: #FFFFFF; padding-bottom: 8px; font-size: 13px; font-weight: 700; text-align: right;">{{startDate}} &rarr; {{endDate}}</td>
+        </tr>
+        <tr>
+          <td style="color: #5D5D6D; font-size: 13px;">Decision Status</td>
+          <td style="color: #00FF87; font-size: 13px; font-weight: 700; text-align: right;">Authorized</td>
+        </tr>
+      </table>
+    </div>
+
+    {{#if note}}
+    <div style="background: #1A1A1E; padding: 16px; border-radius: 8px; margin-top: 20px;">
+      <p style="color: #5D5D6D; font-size: 11px; text-transform: uppercase; margin: 0 0 8px; font-weight: 700;">Manager's Note</p>
+      <p style="color: #D1D1D1; font-size: 13px; margin: 0; font-style: italic;">"{{note}}"</p>
+    </div>
+    {{/if}}
+
+    <div style="margin-top: 32px; text-align: center;">
+      <a href="{{appUrl}}/dashboard" style="display: inline-block; padding: 12px 28px; background: #00FF87; color: #000000; text-decoration: none; border-radius: 8px; font-weight: 700; font-size: 13px;">Open Dashboard</a>
+    </div>
+  </div>
+
+  <div style="text-align: center;">
+    <p style="color: #44444D; font-size: 12px; line-height: 1.6; margin: 0;">
+      Please ensure your tasks are handed over before your leave starts.
+    </p>
+    <div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid #1A1A1E;">
+      <p style="color: #333338; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">&copy; 2026 Obsidian Enterprise Leave Management System</p>
+    </div>
   </div>
 </div>

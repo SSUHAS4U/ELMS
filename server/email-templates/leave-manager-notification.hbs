@@ -1,22 +1,47 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <style>
-        body { font-family: 'Inter', sans-serif; background-color: #0A0A0B; color: #F0F0F5; padding: 20px; }
-        .container { max-width: 600px; margin: 0 auto; background-color: #111114; padding: 30px; border-radius: 12px; border: 1px solid #2A2A35; }
-        h2 { color: #00FF87; }
-        p { color: #8888A0; line-height: 1.6; }
-        .highlight { color: #F0F0F5; font-weight: bold; }
-        .button { display: inline-block; padding: 12px 24px; background-color: #00FF87; color: #0A0A0B; text-decoration: none; border-radius: 8px; font-weight: bold; margin-top: 20px; }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h2>Action Required: Leave Approval</h2>
-        <p>Hi <span class="highlight">{{managerName}}</span>,</p>
-        <p><span class="highlight">{{employeeName}}</span> has requested <span class="highlight">{{type}} leave</span> from <strong>{{startDate}}</strong> to <strong>{{endDate}}</strong>.</p>
-        <p>Please review and approve this request via the dashboard.</p>
-        <a href="{{appUrl}}/dashboard" class="button">Review Request</a>
+<div style="font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 550px; margin: 0 auto; padding: 40px; background-color: #0A0A0B; color: #F0F0F5; border-radius: 20px; border: 1px solid #1A1A1E; box-shadow: 0 15px 40px rgba(0,0,0,0.6);">
+  <div style="text-align: center; margin-bottom: 32px;">
+    <div style="display: inline-block; width: 48px; height: 48px; background: #7B61FF; border-radius: 12px; margin-bottom: 16px; line-height: 48px; font-size: 24px;">⚖️</div>
+    <h1 style="color: #FFFFFF; font-size: 24px; font-weight: 800; margin: 0; letter-spacing: -0.01em;">Action Required</h1>
+    <p style="color: #8888A0; font-size: 14px; margin-top: 4px; font-weight: 500;">Obsidian Management Queue</p>
+  </div>
+
+  <div style="background-color: #111114; border: 1px solid #1F1F24; border-radius: 14px; padding: 32px; margin-bottom: 32px;">
+    <p style="color: #F0F0F5; font-size: 15px; margin: 0 0 16px; font-weight: 500;">Hello Manager,</p>
+    <p style="color: #8888A0; font-size: 14px; line-height: 1.6; margin: 0 0 24px;">A new leave request has been submitted by a team member. Your decision is required to update the organizational schedule:</p>
+    
+    <div style="background: #0A0A0B; padding: 20px; border-radius: 12px; border-left: 4px solid #7B61FF; margin-bottom: 24px;">
+      <table style="width: 100%; border-collapse: collapse;">
+        <tr>
+          <td style="color: #5D5D6D; padding-bottom: 8px; font-size: 13px;">Team Member</td>
+          <td style="color: #FFFFFF; padding-bottom: 8px; font-size: 13px; font-weight: 700; text-align: right;">{{employeeName}}</td>
+        </tr>
+        <tr>
+          <td style="color: #5D5D6D; padding-bottom: 8px; font-size: 13px;">Classification</td>
+          <td style="color: #FFFFFF; padding-bottom: 8px; font-size: 13px; font-weight: 700; text-align: right; text-transform: capitalize;">{{type}} Leave</td>
+        </tr>
+        <tr>
+          <td style="color: #5D5D6D; padding-bottom: 8px; font-size: 13px;">Duration</td>
+          <td style="color: #FFFFFF; padding-bottom: 8px; font-size: 13px; font-weight: 700; text-align: right;">{{startDate}} &rarr; {{endDate}}</td>
+        </tr>
+      </table>
     </div>
-</body>
-</html>
+
+    <div style="background: #1A1A1E; padding: 16px; border-radius: 8px; margin-top: 20px;">
+      <p style="color: #5D5D6D; font-size: 11px; text-transform: uppercase; margin: 0 0 8px; font-weight: 700;">Employee's Reason</p>
+      <p style="color: #D1D1D1; font-size: 13px; margin: 0; font-style: italic;">"{{reason}}"</p>
+    </div>
+
+    <div style="margin-top: 32px; text-align: center;">
+      <a href="{{appUrl}}/admin/leaves" style="display: inline-block; padding: 14px 32px; background: #7B61FF; color: #FFFFFF; text-decoration: none; border-radius: 10px; font-weight: 800; font-size: 14px;">Review in Admin Panel →</a>
+    </div>
+  </div>
+
+  <div style="text-align: center;">
+    <p style="color: #44444D; font-size: 12px; line-height: 1.6; margin: 0;">
+      As a manager, you are responsible for maintaining team coverage during leave periods.
+    </p>
+    <div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid #1A1A1E;">
+      <p style="color: #333338; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">&copy; 2026 Obsidian Enterprise Leave Management System</p>
+    </div>
+  </div>
+</div>

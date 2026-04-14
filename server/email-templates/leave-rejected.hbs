@@ -1,10 +1,49 @@
-<div style="font-family:'Segoe UI',sans-serif;max-width:480px;margin:0 auto;padding:32px;background:#0A0A0B;border-radius:12px;border:1px solid #2A2A35;">
-  <div style="text-align:center;margin-bottom:24px;">
-    <div style="display:inline-block;width:40px;height:40px;background:#FF4466;border-radius:8px;"></div>
-    <h1 style="color:#FF4466;font-size:22px;margin:16px 0 4px;">Leave Rejected</h1>
+<div style="font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 550px; margin: 0 auto; padding: 40px; background-color: #0A0A0B; color: #F0F0F5; border-radius: 20px; border: 1px solid #1A1A1E;">
+  <div style="text-align: center; margin-bottom: 32px;">
+    <div style="display: inline-block; width: 48px; height: 48px; background: #FF4466; border-radius: 12px; margin-bottom: 16px; line-height: 48px; font-size: 24px;">❌</div>
+    <h1 style="color: #FFFFFF; font-size: 24px; font-weight: 800; margin: 0; letter-spacing: -0.01em;">Request Declined</h1>
+    <p style="color: #8888A0; font-size: 14px; margin-top: 4px; font-weight: 500;">Obsidian Workflow Notification</p>
   </div>
-  <div style="background:#111114;border:1px solid #2A2A35;border-radius:8px;padding:24px;margin:24px 0;">
-    <p style="color:#F0F0F5;font-size:14px;margin:0 0 8px;">Your leave for <strong>{{dates}}</strong> has been rejected.</p>
-    {{#if note}}<p style="color:#8888A0;font-size:13px;margin:12px 0 0;">Reason: {{note}}</p>{{/if}}
+
+  <div style="background-color: #111114; border: 1px solid #1F1F24; border-radius: 14px; padding: 32px; margin-bottom: 32px;">
+    <p style="color: #F0F0F5; font-size: 15px; margin: 0 0 16px; font-weight: 500;">Hello <strong>{{name}}</strong>,</p>
+    <p style="color: #8888A0; font-size: 14px; line-height: 1.6; margin: 0 0 24px;">Your leave request has been reviewed and unfortunately declined at this time. Details of the submission:</p>
+    
+    <div style="background: #0A0A0B; padding: 20px; border-radius: 12px; border-left: 4px solid #FF4466; margin-bottom: 24px;">
+      <table style="width: 100%; border-collapse: collapse;">
+        <tr>
+          <td style="color: #5D5D6D; padding-bottom: 8px; font-size: 13px;">Classification</td>
+          <td style="color: #FFFFFF; padding-bottom: 8px; font-size: 13px; font-weight: 700; text-align: right; text-transform: capitalize;">{{type}} Leave</td>
+        </tr>
+        <tr>
+          <td style="color: #5D5D6D; padding-bottom: 8px; font-size: 13px;">Requested Range</td>
+          <td style="color: #FFFFFF; padding-bottom: 8px; font-size: 13px; font-weight: 700; text-align: right;">{{startDate}} &rarr; {{endDate}}</td>
+        </tr>
+        <tr>
+          <td style="color: #5D5D6D; font-size: 13px;">Decision Status</td>
+          <td style="color: #FF4466; font-size: 13px; font-weight: 700; text-align: right;">Rejected</td>
+        </tr>
+      </table>
+    </div>
+
+    {{#if note}}
+    <div style="background: #1A1A1E; padding: 16px; border-radius: 8px; margin-top: 20px;">
+      <p style="color: #5D5D6D; font-size: 11px; text-transform: uppercase; margin: 0 0 8px; font-weight: 700;">Manager's Reason</p>
+      <p style="color: #D1D1D1; font-size: 13px; margin: 0; font-style: italic;">"{{note}}"</p>
+    </div>
+    {{/if}}
+
+    <div style="margin-top: 32px; text-align: center;">
+      <a href="{{appUrl}}/dashboard" style="display: inline-block; padding: 12px 28px; background: transparent; color: #FFFFFF; text-decoration: none; border: 1px solid #2A2A35; border-radius: 8px; font-weight: 600; font-size: 13px;">Contact Manager</a>
+    </div>
+  </div>
+
+  <div style="text-align: center;">
+    <p style="color: #44444D; font-size: 12px; line-height: 1.6; margin: 0;">
+      If you believe this is a mistake, please reach out to your department head.
+    </p>
+    <div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid #1A1A1E;">
+      <p style="color: #333338; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">&copy; 2026 Obsidian Enterprise Leave Management System</p>
+    </div>
   </div>
 </div>

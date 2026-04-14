@@ -1,16 +1,41 @@
-<div style="font-family:'Segoe UI',sans-serif;max-width:480px;margin:0 auto;padding:32px;background:#0A0A0B;border-radius:12px;border:1px solid #2A2A35;">
-  <div style="text-align:center;margin-bottom:24px;">
-    <div style="display:inline-block;width:40px;height:40px;background:#00FF87;border-radius:8px;"></div>
-    <h1 style="color:#F0F0F5;font-size:22px;margin:16px 0 4px;">Welcome to Obsidian ELMS</h1>
+<div style="font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 550px; margin: 0 auto; padding: 40px; background-color: #0A0A0B; color: #F0F0F5; border-radius: 20px; border: 1px solid #1A1A1E; box-shadow: 0 15px 40px rgba(0,0,0,0.6);">
+  <div style="text-align: center; margin-bottom: 32px;">
+    <div style="display: inline-block; width: 56px; height: 56px; background: linear-gradient(135deg, #00FF87 0%, #00D1FF 100%); border-radius: 14px; margin-bottom: 20px;"></div>
+    <h1 style="color: #FFFFFF; font-size: 28px; font-weight: 800; margin: 0; letter-spacing: -0.02em;">Welcome to the Team</h1>
+    <p style="color: #8888A0; font-size: 15px; margin-top: 6px; font-weight: 500;">Obsidian Enterprise Onboarding</p>
   </div>
-  <div style="background:#111114;border:1px solid #2A2A35;border-radius:8px;padding:24px;margin:24px 0;">
-    <p style="color:#F0F0F5;font-size:15px;margin:0 0 16px;">Hi <strong>{{name}}</strong>,</p>
-    <p style="color:#8888A0;font-size:14px;margin:0 0 16px;">Your account has been created. Here are your credentials:</p>
-    <table style="width:100%;border-collapse:collapse;">
-      <tr><td style="color:#8888A0;padding:6px 0;font-size:13px;">Email</td><td style="color:#F0F0F5;padding:6px 0;font-size:13px;font-weight:600;">{{email}}</td></tr>
-      <tr><td style="color:#8888A0;padding:6px 0;font-size:13px;">Password</td><td style="color:#00FF87;padding:6px 0;font-size:13px;font-weight:600;font-family:monospace;">{{password}}</td></tr>
-      <tr><td style="color:#8888A0;padding:6px 0;font-size:13px;">Role</td><td style="color:#F0F0F5;padding:6px 0;font-size:13px;font-weight:600;text-transform:uppercase;">{{role}}</td></tr>
+
+  <div style="background-color: #111114; border: 1px solid #1F1F24; border-radius: 14px; padding: 32px; margin-bottom: 32px;">
+    <p style="color: #F0F0F5; font-size: 16px; margin: 0 0 20px; font-weight: 600;">Hello {{name}},</p>
+    <p style="color: #8888A0; font-size: 14px; line-height: 1.6; margin: 0 0 24px;">Your organizational account for Obsidian ELMS is ready. Use the encrypted credentials below to access your dashboard:</p>
+    
+    <table style="width: 100%; border-collapse: separate; border-spacing: 0 8px;">
+      <tr>
+        <td style="color: #5D5D6D; padding: 12px; font-size: 13px; background: #0A0A0B; border-radius: 8px 0 0 8px;">Account Email</td>
+        <td style="color: #FFFFFF; padding: 12px; font-size: 13px; font-weight: 700; background: #0A0A0B; border-radius: 0 8px 8px 0; text-align: right;">{{email}}</td>
+      </tr>
+      <tr>
+        <td style="color: #5D5D6D; padding: 12px; font-size: 13px; background: #0A0A0B; border-radius: 8px 0 0 8px;">Temporary Pass</td>
+        <td style="color: #00FF87; padding: 12px; font-size: 13px; font-weight: 700; background: #0A0A0B; border-radius: 0 8px 8px 0; text-align: right; font-family: monospace;">{{password}}</td>
+      </tr>
+      <tr>
+        <td style="color: #5D5D6D; padding: 12px; font-size: 13px; background: #0A0A0B; border-radius: 8px 0 0 8px;">Security Level</td>
+        <td style="color: #00D1FF; padding: 12px; font-size: 13px; font-weight: 700; background: #0A0A0B; border-radius: 0 8px 8px 0; text-align: right; text-transform: uppercase;">{{role}}</td>
+      </tr>
     </table>
+
+    <div style="margin-top: 32px; text-align: center;">
+      <a href="https://elms-7bz7.onrender.com/login" style="display: inline-block; padding: 14px 32px; background: #00FF87; color: #000000; text-decoration: none; border-radius: 10px; font-weight: 800; font-size: 14px; box-shadow: 0 4px 15px rgba(0,255,135,0.3);">Access Dashboard →</a>
+    </div>
   </div>
-  <p style="color:#555;font-size:12px;text-align:center;">Please change your password after first login.</p>
+
+  <div style="text-align: center;">
+    <p style="color: #44444D; font-size: 12px; line-height: 1.6; margin: 0;">
+      For security reasons, you will be required to change your password upon first login.<br>
+      This link is for authorized personnel only.
+    </p>
+    <div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid #1A1A1E;">
+      <p style="color: #333338; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">&copy; 2026 Obsidian Enterprise Leave Management System</p>
+    </div>
+  </div>
 </div>

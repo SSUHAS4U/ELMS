@@ -48,7 +48,7 @@ export const sendEmail = async ({ email, to, subject, template, templateName, co
   // 2. Send via Brevo HTTP API (Transactional)
   return new Promise((resolve) => {
     const data = JSON.stringify({
-      sender: { name: 'ELMS Admin', email: senderEmail },
+      sender: { name: 'Obsidian ELMS', email: senderEmail },
       to: [{ email: recipient }],
       subject: subject,
       htmlContent: html
