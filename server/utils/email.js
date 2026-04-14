@@ -8,12 +8,14 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Security: Sanity check environment variables
-const resendApiKey = process.env.RESEND_API_KEY;
-console.log(`[Email System] Resend API: ${resendApiKey ? 'CONFIGURED' : 'MISSING'}`);
+const brevoApiKey = process.env.BREVO_API_KEY;
+const senderEmail = process.env.BREVO_SENDER_EMAIL || 'notif.elms@gmail.com'; 
+
+console.log(`[Email System] Brevo API Status: ${brevoApiKey ? 'CONFIGURED' : 'MISSING (Check .env)'}`);
 
 /**
- * Unified email sender using Resend HTTP API.
- * Bypasses Render's SMTP port blocking.
+ * Unified email sender using Brevo v3 HTTP API.
+ * Bypasses Render's SMTP port blocking by using HTTPS (Port 443).
  */
 export const sendEmail = async ({ email, to, subject, template, templateName, context }) => {
   const recipient = to || email;
@@ -33,54 +35,48 @@ export const sendEmail = async ({ email, to, subject, template, templateName, co
     html = compiled(context || {});
   } else {
     html = `<div style="font-family:sans-serif;padding:24px;">
-      <h2 style="color:#00C96B;">${subject}</h2>
+      <h2 style="color:#7B61FF;">${subject}</h2>
       <pre style="background:#f5f5f5;padding:16px;border-radius:8px;">${JSON.stringify(context, null, 2)}</pre>
-      <p style="color:#888;margin-top:16px;">— Obsidian ELMS</p>
+      <p style="color:#888;margin-top:16px;">— ELMS Notification</p>
     </div>`;
   }
 
-  // 2. Send via Resend HTTP API
+  // 2. Send via Brevo HTTP API (Transactional)
   return new Promise((resolve) => {
     const data = JSON.stringify({
-      from: 'Obsidian ELMS <onboarding@resend.dev>',
-      to: [recipient],
+      sender: { name: 'ELMS Admin', email: senderEmail },
+      to: [{ email: recipient }],
       subject: subject,
-      html: html
+      htmlContent: html
     });
 
     const options = {
-      hostname: 'api.resend.com',
+      hostname: 'api.brevo.com',
       port: 443,
-      path: '/emails',
+      path: '/v3/smtp/email',
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${resendApiKey}`,
-        'Content-Length': data.length
+        'accept': 'application/json',
+        'api-key': brevoApiKey,
+        'content-type': 'application/json',
+        'content-length': data.length
       }
     };
 
-    console.log(`[Email System] Firing HTTP API request to Resend for: ${recipient}`);
-    console.log(`[Email System] Subject: ${subject}`);
+    console.log(`[Email System] Brevo API Request for: ${recipient}`);
     
-    // In Sandbox mode, we should also log the context for development visibility
-    if (process.env.NODE_ENV !== 'production') {
-      console.log('[Email System] Context Data:', JSON.stringify(context, null, 2));
-    }
-
     const req = https.request(options, (res) => {
       let responseData = '';
       res.on('data', (chunk) => { responseData += chunk; });
       res.on('end', () => {
         if (res.statusCode >= 200 && res.statusCode < 300) {
-          console.log(`[Email System] Success! Sent via Resend to: ${recipient}`);
+          console.log(`[Email System] Success! Sent via Brevo to: ${recipient}`);
           resolve(true);
         } else {
-          console.error(`[Email System] Resend API Error (${res.statusCode}): ${responseData}`);
-          console.error(`[Email System] Target Recipient: ${recipient}`);
-          console.warn('[Email System] HINT: If you are in Resend Sandbox, you can only send to your own verified email.');
-          // Even if API fails, resolve true so the app flow doesn't break for the user
-          resolve(true); 
+          console.error(`[Email System] Brevo API Error (${res.statusCode}): ${responseData}`);
+          console.error(`[Email System] Recipient Attempted: ${recipient}`);
+          console.warn('[Email System] HINT: Ensure the SENDER_EMAIL is verified in Brevo dashboard.');
+          resolve(false);
         }
       });
     });
