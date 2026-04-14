@@ -33,10 +33,15 @@ export const sendEmail = async ({ email, to, subject, template, templateName, co
   // 1. Prepare HTML Content
   const templatePath = path.join(__dirname, `../email-templates/${tmplName}.hbs`);
   let html;
+  
+  // Define the Frontend App URL for links
+  const appUrl = process.env.CLIENT_URL || 'https://obsidianelms.netlify.app';
+
   if (fs.existsSync(templatePath)) {
     const source = fs.readFileSync(templatePath, 'utf-8');
     const compiled = handlebars.compile(source);
-    html = compiled(context || {});
+    // Inject appUrl into context so templates can use {{appUrl}}
+    html = compiled({ ...context, appUrl });
   } else {
     html = `<div style="font-family:sans-serif;padding:24px;">
       <h2 style="color:#7B61FF;">${subject}</h2>
