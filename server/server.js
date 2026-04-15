@@ -110,6 +110,16 @@ app.use('/api/analytics', analyticsRoutes);
 app.use('/api/audit-log', auditLogRoutes);
 app.use('/api/org', orgSettingsRoutes);
 
+// Catch-all Redirect for Non-API Frontend Routes
+// If a user accidentally hits https://backend.com/login, they get redirected to https://frontend.com/login
+app.get('*', (req, res, next) => {
+  if (req.path.startsWith('/api') || req.path.startsWith('/socket.io')) {
+    return next();
+  }
+  const frontendUrl = process.env.FRONTEND_URL || (process.env.CLIENT_URL ? process.env.CLIENT_URL.split(',')[0].trim() : null) || 'https://obsidianelms.netlify.app';
+  res.redirect(`${frontendUrl}${req.originalUrl}`);
+});
+
 // Socket logic
 io.on('connection', (socket) => {
   console.log('Client connected:', socket.id);

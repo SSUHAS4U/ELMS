@@ -35,7 +35,9 @@ export const sendEmail = async ({ email, to, subject, template, templateName, co
   let html;
   
   // Define the Frontend App URL for links
-  const appUrl = process.env.CLIENT_URL || 'https://obsidianelms.netlify.app';
+  // Priority: 1. FRONTEND_URL, 2. First URL in CLIENT_URL (if comma-separated), 3. Default fallback
+  const frontendUrl = process.env.FRONTEND_URL || (process.env.CLIENT_URL ? process.env.CLIENT_URL.split(',')[0].trim() : null);
+  const appUrl = frontendUrl || 'https://obsidianelms.netlify.app';
 
   if (fs.existsSync(templatePath)) {
     const source = fs.readFileSync(templatePath, 'utf-8');
