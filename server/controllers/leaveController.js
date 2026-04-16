@@ -66,8 +66,7 @@ export const applyLeave = async (req, res, next) => {
             employeeName: req.user.name, 
             type: leaveType,
             startDate: new Date(startDate).toLocaleDateString(),
-            endDate: new Date(endDate).toLocaleDateString(),
-            appUrl: process.env.CLIENT_URL || 'http://localhost:5173'
+            endDate: new Date(endDate).toLocaleDateString()
           }
         });
       } catch (emailError) {

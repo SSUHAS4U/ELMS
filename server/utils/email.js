@@ -37,7 +37,7 @@ export const sendEmail = async ({ email, to, subject, template, templateName, co
   // Define the Frontend App URL for links
   // Priority: 1. FRONTEND_URL, 2. First URL in CLIENT_URL (if comma-separated), 3. Default fallback
   const frontendUrl = process.env.FRONTEND_URL || (process.env.CLIENT_URL ? process.env.CLIENT_URL.split(',')[0].trim() : null);
-  const appUrl = frontendUrl || 'https://obsidianelms.netlify.app';
+  const appUrl = (frontendUrl && !frontendUrl.includes('localhost')) ? frontendUrl : 'https://obsidianelms.netlify.app';
 
   if (fs.existsSync(templatePath)) {
     const source = fs.readFileSync(templatePath, 'utf-8');
