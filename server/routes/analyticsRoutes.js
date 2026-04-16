@@ -6,7 +6,8 @@ import {
   getLeaveTrends,
   getLeaveTypeDistribution,
   getAttendanceRate,
-  getBirthdayAnniversaries
+  getBirthdayAnniversaries,
+  getEmployeeStats
 } from '../controllers/analyticsController.js';
 
 const router = express.Router();
@@ -20,5 +21,6 @@ router.get('/trends',         getLeaveTrends);
 router.get('/leave-types',    getLeaveTypeDistribution);
 router.get('/attendance',     getAttendanceRate);
 router.get('/birthdays',      getBirthdayAnniversaries);
+router.get('/employee-stats/:id', getEmployeeStats);
 
 export default router;

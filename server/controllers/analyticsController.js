@@ -303,3 +303,48 @@ export const getBirthdayAnniversaries = async (req, res, next) => {
     next(error);
   }
 };
+
+// ─────────────────────────────────────────────
+// @route GET /api/analytics/employee-stats/:id (Admin/HR)
+// Detailed leave usage vs balance for one employee
+// ─────────────────────────────────────────────
+export const getEmployeeStats = async (req, res, next) => {
+  try {
+    const userId = req.params.id;
+    const user = await User.findById(userId).select('name leaveBalance');
+    if (!user) return res.status(404).json({ success: false, message: 'User not found' });
+
+    const startOfYear = new Date(new Date().getFullYear(), 0, 1);
+
+    // Aggregate approved leave days by type for this employee
+    const usage = await LeaveRequest.aggregate([
+      {
+        $match: {
+          employee:  user._id,
+          status:    'approved',
+          startDate: { $gte: startOfYear }
+        }
+      },
+      {
+        $group: {
+          _id:       '$leaveType',
+          totalDays: { $sum: '$numberOfDays' }
+        }
+      }
+    ]);
+
+    // Format for frontend consumption
+    const stats = Object.keys(user.leaveBalance.toObject()).map(type => {
+      const used = usage.find(u => u._id === type)?.totalDays || 0;
+      return {
+        type: type.charAt(0).toUpperCase() + type.slice(1),
+        used,
+        remaining: user.leaveBalance[type]
+      };
+    });
+
+    res.status(200).json({ success: true, data: stats });
+  } catch (error) {
+    next(error);
+  }
+};

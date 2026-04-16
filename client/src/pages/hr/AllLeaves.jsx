@@ -1,8 +1,10 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Calendar, LayoutList, Filter, Search } from 'lucide-react';
 import api from '../../lib/api';
 import { toast } from 'sonner';
+import EmployeeMonitoringDetails from '../../components/hr/EmployeeMonitoringDetails';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 
 const STATUS_COLORS = {
   pending:  'bg-[color:var(--status-pending)]/10 border-[color:var(--status-pending)]/30 text-[color:var(--status-pending)]',
@@ -23,6 +25,7 @@ const AllLeaves = () => {
   const [statusFilter, setStatusFilter] = useState('');
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
+  const [expandedId, setExpandedId] = useState(null);
   const LIMIT = 20;
 
   const fetchLeaves = async () => {
@@ -104,20 +107,56 @@ const AllLeaves = () => {
               ) : filtered.length === 0 ? (
                 <tr><td colSpan="8" className="text-center py-10 text-[color:var(--text-secondary)]">No leave records found</td></tr>
               ) : filtered.map((leave, i) => (
-                <motion.tr key={leave._id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.03 }}
-                  className="hover:bg-[color:var(--bg-overlay)]/60 transition-colors">
-                  <td className="px-5 py-3.5">
-                    <div className="font-medium">{leave.employee?.name}</div>
-                    <div className="text-xs text-[color:var(--text-secondary)]">{leave.employee?.email}</div>
-                  </td>
-                  <td className="px-5 py-3.5 capitalize font-medium">{leave.leaveType}</td>
-                  <td className="px-5 py-3.5">{new Date(leave.startDate).toLocaleDateString('en-GB')}</td>
-                  <td className="px-5 py-3.5">{new Date(leave.endDate).toLocaleDateString('en-GB')}</td>
-                  <td className="px-5 py-3.5 font-bold">{leave.numberOfDays}</td>
-                  <td className="px-5 py-3.5"><StatusPill status={leave.status} /></td>
-                  <td className="px-5 py-3.5 text-[color:var(--text-secondary)]">{new Date(leave.createdAt).toLocaleDateString('en-GB')}</td>
-                  <td className="px-5 py-3.5">{leave.applyTo?.name || '—'}</td>
-                </motion.tr>
+                <React.Fragment key={leave._id}>
+                  <motion.tr 
+                    initial={{ opacity: 0 }} 
+                    animate={{ opacity: 1 }} 
+                    transition={{ delay: i * 0.03 }}
+                    onClick={() => setExpandedId(expandedId === leave._id ? null : leave._id)}
+                    className={`cursor-pointer transition-colors ${expandedId === leave._id ? 'bg-[color:var(--bg-overlay)]' : 'hover:bg-[color:var(--bg-overlay)]/60'}`}
+                  >
+                    <td className="px-5 py-3.5">
+                      <div className="flex items-center gap-3">
+                        <div className="text-[color:var(--text-secondary)]">
+                          {expandedId === leave._id ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                        </div>
+                        <div>
+                          <div className="font-medium">{leave.employee?.name}</div>
+                          <div className="text-xs text-[color:var(--text-secondary)]">{leave.employee?.email}</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-5 py-3.5 capitalize font-medium">{leave.leaveType}</td>
+                    <td className="px-5 py-3.5">{new Date(leave.startDate).toLocaleDateString('en-GB')}</td>
+                    <td className="px-5 py-3.5">{new Date(leave.endDate).toLocaleDateString('en-GB')}</td>
+                    <td className="px-5 py-3.5 font-bold">{leave.numberOfDays}</td>
+                    <td className="px-5 py-3.5"><StatusPill status={leave.status} /></td>
+                    <td className="px-5 py-3.5 text-[color:var(--text-secondary)]">{new Date(leave.createdAt).toLocaleDateString('en-GB')}</td>
+                    <td className="px-5 py-3.5">{leave.applyTo?.name || '—'}</td>
+                  </motion.tr>
+                  <AnimatePresence>
+                    {expandedId === leave._id && (
+                      <tr>
+                        <td colSpan="8" className="p-0 border-none">
+                          <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: 'auto', opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            transition={{ duration: 0.3, ease: 'easeInOut' }}
+                            className="overflow-hidden"
+                          >
+                            <div className="p-6 bg-[color:var(--bg-overlay)]/40 border-y border-[color:var(--border-subtle)]/30">
+                              <EmployeeMonitoringDetails 
+                                employeeId={leave.employee?._id} 
+                                employeeName={leave.employee?.name} 
+                              />
+                            </div>
+                          </motion.div>
+                        </td>
+                      </tr>
+                    )}
+                  </AnimatePresence>
+                </React.Fragment>
               ))}
             </tbody>
           </table>

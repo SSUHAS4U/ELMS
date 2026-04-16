@@ -97,7 +97,22 @@ export const getMyLeaves = async (req, res, next) => {
 // @route GET /api/leaves/all (HR/Admin)
 export const getAllLeaves = async (req, res, next) => {
   try {
-    const leaves = await LeaveRequest.find()
+    const filter = {};
+    if (req.user.role === 'hr') {
+      filter.applyTo = req.user._id;
+    }
+
+    const { status, search } = req.query;
+    if (status) filter.status = status;
+    
+    // Note: Search by employee name is handled by populate if we use aggregation, 
+    // but here we can do a name match if we fetch user IDs first.
+    if (search) {
+      const users = await User.find({ name: { $regex: search, $options: 'i' } }).select('_id');
+      filter.employee = { $in: users.map(u => u._id) };
+    }
+
+    const leaves = await LeaveRequest.find(filter)
       .populate('employee', 'name email avatar department')
       .populate('approvedBy', 'name')
       .sort('-createdAt');
