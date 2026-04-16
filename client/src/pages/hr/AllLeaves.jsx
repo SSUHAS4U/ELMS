@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Calendar, LayoutList, Filter, Search } from 'lucide-react';
 import api from '../../lib/api';
 import { toast } from 'sonner';
@@ -35,7 +35,7 @@ const AllLeaves = () => {
       if (statusFilter) params.append('status', statusFilter);
       if (search) params.append('search', search);
       const res = await api.get(`/leaves/all?${params}`);
-      setLeaves(res.data.leaves);
+      setLeaves(res.data.leaves || []);
       setTotal(res.data.count || 0);
     } catch (error) {
       toast.error('Failed to load leaves');
@@ -52,9 +52,9 @@ const AllLeaves = () => {
     fetchLeaves();
   };
 
-  const filtered = search
+  const filtered = (search && Array.isArray(leaves))
     ? leaves.filter(l => l.employee?.name?.toLowerCase().includes(search.toLowerCase()))
-    : leaves;
+    : (Array.isArray(leaves) ? leaves : []);
 
   return (
     <div className="space-y-6 pb-12">
