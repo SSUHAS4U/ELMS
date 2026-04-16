@@ -3,7 +3,7 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, 
   PieChart, Pie, Cell 
 } from 'recharts';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { TrendingUp, PieChart as PieIcon, BarChart3, AlertCircle } from 'lucide-react';
 import api from '../../lib/api';
 
@@ -105,16 +105,15 @@ const EmployeeMonitoringDetails = ({ employeeId, employeeName }) => {
         {/* Chart View */}
         <div className="lg:col-span-3 h-[320px] bg-[color:var(--bg-surface)] p-6 rounded-2xl border border-[color:var(--border-subtle)] shadow-sm relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-[color:var(--accent-primary)]/5 to-transparent pointer-events-none" />
-          <AnimatePresence mode="wait">
+          <div className="h-full">
             {activeTab === 'bar' ? (
               <motion.div 
                 key="bar"
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.95 }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
                 className="w-full h-full"
               >
-                <ResponsiveContainer width="100%" height="100%">
+                <ResponsiveContainer width="99%" height="100%" minHeight={300}>
                   <BarChart data={stats} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
                     <XAxis 
@@ -141,12 +140,11 @@ const EmployeeMonitoringDetails = ({ employeeId, employeeName }) => {
             ) : (
               <motion.div 
                 key="pie"
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.95 }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
                 className="w-full h-full"
               >
-                <ResponsiveContainer width="100%" height="100%">
+                <ResponsiveContainer width="99%" height="100%" minHeight={300}>
                   <PieChart>
                     <Pie
                       data={stats}
@@ -175,7 +173,7 @@ const EmployeeMonitoringDetails = ({ employeeId, employeeName }) => {
                 </div>
               </motion.div>
             )}
-          </AnimatePresence>
+          </div>
         </div>
       </div>
     </div>

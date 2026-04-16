@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Calendar, LayoutList, Filter, Search } from 'lucide-react';
 import api from '../../lib/api';
 import { toast } from 'sonner';
@@ -134,28 +134,22 @@ const AllLeaves = () => {
                     <td className="px-5 py-3.5 text-[color:var(--text-secondary)]">{new Date(leave.createdAt).toLocaleDateString('en-GB')}</td>
                     <td className="px-5 py-3.5">{leave.applyTo?.name || '—'}</td>
                   </motion.tr>
-                  <AnimatePresence>
-                    {expandedId === leave._id && (
-                      <tr>
-                        <td colSpan="8" className="p-0 border-none">
-                          <motion.div
-                            initial={{ height: 0, opacity: 0 }}
-                            animate={{ height: 'auto', opacity: 1 }}
-                            exit={{ height: 0, opacity: 0 }}
-                            transition={{ duration: 0.3, ease: 'easeInOut' }}
-                            className="overflow-hidden"
-                          >
-                            <div className="p-6 bg-[color:var(--bg-overlay)]/40 border-y border-[color:var(--border-subtle)]/30">
-                              <EmployeeMonitoringDetails 
-                                employeeId={leave.employee?._id} 
-                                employeeName={leave.employee?.name} 
-                              />
-                            </div>
-                          </motion.div>
-                        </td>
-                      </tr>
-                    )}
-                  </AnimatePresence>
+                  {expandedId === leave._id && (
+                    <motion.tr 
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <td colSpan="8" className="p-0 border-none">
+                        <div className="p-6 bg-[color:var(--bg-overlay)]/40 border-y border-[color:var(--border-subtle)]/30">
+                          <EmployeeMonitoringDetails 
+                            employeeId={leave.employee?._id} 
+                            employeeName={leave.employee?.name} 
+                          />
+                        </div>
+                      </td>
+                    </motion.tr>
+                  )}
                 </React.Fragment>
               ))}
             </tbody>
