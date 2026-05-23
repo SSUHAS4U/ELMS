@@ -4,41 +4,41 @@ import useThemeStore from './hooks/useThemeStore';
 import useAuthStore from './hooks/useAuthStore';
 import { Toaster } from 'sonner';
 
-// Layout
+// Layout — small, always needed
 import AppShell from './components/layout/AppShell';
 import ProtectedRoute from './components/layout/ProtectedRoute';
 import useSocket from './hooks/useSocket';
 
-// Pages — eagerly loaded (small files)
+// Public pages — small, eagerly loaded for instant first paint
 import Landing from './pages/Landing';
 import Login from './pages/Login';
 
-// Employee
-import EmployeeDashboard from './pages/employee/EmployeeDashboard';
-import EmployeeLeaves from './pages/employee/Leaves';
-import SwipeData from './pages/employee/SwipeData';
-import Timesheet from './pages/employee/Timesheet';
-import Payslip from './pages/employee/Payslip';
-import Assets from './pages/employee/Assets';
+// Employee — lazy loaded, only fetched when navigated to
+const EmployeeDashboard = lazy(() => import('./pages/employee/EmployeeDashboard'));
+const EmployeeLeaves    = lazy(() => import('./pages/employee/Leaves'));
+const SwipeData         = lazy(() => import('./pages/employee/SwipeData'));
+const Timesheet         = lazy(() => import('./pages/employee/Timesheet'));
+const Payslip           = lazy(() => import('./pages/employee/Payslip'));
+const Assets            = lazy(() => import('./pages/employee/Assets'));
 
-// HR
-import HRDashboard from './pages/hr/HRDashboard';
-import Approvals from './pages/hr/Approvals';
-import AllLeaves from './pages/hr/AllLeaves';
-import HREmployees from './pages/hr/Employees';
-import HRReports from './pages/hr/Reports';
-import Holidays from './pages/hr/Holidays';
+// HR — lazy loaded
+const HRDashboard  = lazy(() => import('./pages/hr/HRDashboard'));
+const Approvals    = lazy(() => import('./pages/hr/Approvals'));
+const AllLeaves    = lazy(() => import('./pages/hr/AllLeaves'));
+const HREmployees  = lazy(() => import('./pages/hr/Employees'));
+const HRReports    = lazy(() => import('./pages/hr/Reports'));
+const Holidays     = lazy(() => import('./pages/hr/Holidays'));
 
-// Admin
-import AdminDashboard from './pages/admin/AdminDashboard';
-import UserManagement from './pages/admin/UserManagement';
-import Departments from './pages/admin/Departments';
-import Organization from './pages/admin/Organization';
-import AuditLog from './pages/admin/AuditLog';
-import AdminReports from './pages/admin/Reports';
+// Admin — lazy loaded
+const AdminDashboard  = lazy(() => import('./pages/admin/AdminDashboard'));
+const UserManagement  = lazy(() => import('./pages/admin/UserManagement'));
+const Departments     = lazy(() => import('./pages/admin/Departments'));
+const Organization    = lazy(() => import('./pages/admin/Organization'));
+const AuditLog        = lazy(() => import('./pages/admin/AuditLog'));
+const AdminReports    = lazy(() => import('./pages/admin/Reports'));
 
-// Settings (Accessible by All)
-import Settings from './pages/Settings';
+// Settings — lazy loaded
+const Settings = lazy(() => import('./pages/Settings'));
 
 // Role-aware redirect for /dashboard index
 const DashboardRedirect = () => {
@@ -76,7 +76,7 @@ function App() {
   return (
     <BrowserRouter>
       <Toaster position="top-right" theme={theme} richColors />
-      
+      <Suspense fallback={<FullScreenLoader />}>
       <Routes>
         {/* PUBLIC ROUTES */}
         <Route path="/" element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <Landing />} />
@@ -125,6 +125,7 @@ function App() {
         {/* Fallback */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
+      </Suspense>
     </BrowserRouter>
   );
 }

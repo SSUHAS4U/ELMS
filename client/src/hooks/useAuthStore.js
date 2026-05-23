@@ -8,15 +8,32 @@ const useAuthStore = create((set) => ({
   isCheckingAuth: true,
   error: null,
 
-  // Check valid session via HttpOnly Cookie
+  // Check valid session via HttpOnly Cookie / localStorage token
   checkAuth: async () => {
+    // Fast path: no local token means definitely not authenticated.
+    // Skip the server round-trip so the Landing page renders instantly.
+    const token = localStorage.getItem('elms_token');
+    if (!token) {
+      set({ isCheckingAuth: false, isAuthenticated: false });
+      return;
+    }
+
+    set({ isCheckingAuth: true, error: null });
+    // Use a 10-second timeout so a cold-starting backend never blocks
+    // the UI indefinitely. If the server doesn't respond in time,
+    // clear the stale token and fall through to the login page.
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 10000);
     try {
-      set({ isCheckingAuth: true, error: null });
-      const res = await api.get('/auth/me');
+      const res = await api.get('/auth/me', { signal: controller.signal });
+      clearTimeout(timer);
       set({ user: res.data.user, isAuthenticated: true, isCheckingAuth: false });
     } catch (error) {
-      // If cookie fails, we don't necessarily want to wipe localStorage here 
-      // unless we're sure it's an invalid token error, which api.js handles via 401.
+      clearTimeout(timer);
+      if (error.name === 'CanceledError' || error.code === 'ERR_CANCELED') {
+        // Server timed out — clear stale token so user can re-login
+        localStorage.removeItem('elms_token');
+      }
       set({ user: null, isAuthenticated: false, isCheckingAuth: false });
     }
   },
