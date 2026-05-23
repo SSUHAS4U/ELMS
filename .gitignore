@@ -1,6 +1,9 @@
 # Intermediate / temp files
 .tmp/
 
+# Claude Code local memory
+.claude/
+
 # Environment & credentials
 .env
 credentials.json
