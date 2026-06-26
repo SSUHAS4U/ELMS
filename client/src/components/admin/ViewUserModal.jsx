@@ -52,23 +52,20 @@ const ViewUserModal = ({ isOpen, onClose, user, onSuccess }) => {
           transition={{ type: 'spring', stiffness: 320, damping: 28 }}
           className="relative w-full max-w-sm bg-surface border border-line rounded-2xl shadow-glass overflow-hidden flex flex-col max-h-[90dvh]"
         >
-          {/* Banner (fixed) */}
-          <div className="relative h-20 shrink-0 border-b border-line/60"
+          {/* Banner — holds the avatar so the scroll area never clips it */}
+          <div className="relative h-20 shrink-0"
             style={{ background: 'linear-gradient(120deg, var(--accent-glow), transparent 65%), var(--bg-elevated)' }}>
             <span className={`absolute top-4 left-5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${user.isActive ? 'bg-[color:var(--success)]/15 text-[color:var(--success)] border border-[color:var(--success)]/25' : 'bg-[color:var(--danger)]/15 text-[color:var(--danger)] border border-[color:var(--danger)]/25'}`}>
               {user.isActive ? 'Active member' : 'Suspended'}
             </span>
-            <button onClick={onClose} aria-label="Close" className="absolute top-4 right-4 w-8 h-8 rounded-full bg-surface border border-line grid place-items-center text-content-secondary hover:text-content transition-colors"><X className="w-4 h-4" /></button>
+            <button onClick={onClose} aria-label="Close" className="absolute top-4 right-4 w-8 h-8 rounded-full bg-surface border border-line grid place-items-center text-content-secondary hover:text-content transition-colors z-10"><X className="w-4 h-4" /></button>
+            <div className="absolute -bottom-10 left-6 w-20 h-20 rounded-2xl bg-[color:var(--accent-glow)] ring-4 ring-[color:var(--bg-surface)] grid place-items-center text-accent font-bold text-3xl font-display shadow-sm z-10">
+              {user.name?.charAt(0).toUpperCase()}
+            </div>
           </div>
 
           {/* Scrollable body */}
-          <div className="px-6 pb-6 overflow-y-auto">
-            <div className="-mt-10 mb-4">
-              <div className="w-20 h-20 rounded-2xl bg-[color:var(--accent-glow)] ring-4 ring-[color:var(--bg-surface)] grid place-items-center text-accent font-bold text-3xl font-display shadow-sm">
-                {user.name?.charAt(0).toUpperCase()}
-              </div>
-            </div>
-
+          <div className="px-6 pb-6 pt-14 overflow-y-auto overscroll-contain">
             <h2 className="font-display text-xl font-bold text-content">{user.name}</h2>
             <p className="text-sm text-content-secondary capitalize mb-4">{user.role} account</p>
 
