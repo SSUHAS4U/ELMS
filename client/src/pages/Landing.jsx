@@ -140,14 +140,14 @@ const Landing = () => {
   const navLinks = [['Features', '#features'], ['How it works', '#how'], ['Roles', '#roles']];
 
   return (
-    <div className="min-h-dvh bg-base text-content relative isolate overflow-x-hidden font-sans">
+    <div className="min-h-dvh bg-base text-content relative isolate overflow-x-clip font-sans">
       {/* Cinematic animated aurora backdrop (21st dev MCP, adapted to emerald theme).
           `isolate` on this root makes it a stacking context so the -z-10 layer paints
           above bg-base (not hidden behind it). */}
       <AuroraBackground />
 
       {/* Nav */}
-      <nav className="fixed left-0 top-0 w-screen z-50 px-4 sm:px-8 py-3 glass border-b border-line/60 flex justify-between items-center">
+      <nav className="sticky top-0 w-full z-50 px-4 sm:px-8 py-3 glass border-b border-line/60 flex justify-between items-center">
         <a href="#top" className="shrink-0"><Logo size={32} wordmark /></a>
         <div className="hidden md:flex items-center gap-1">
           {navLinks.map(([label, href]) => (
@@ -164,7 +164,7 @@ const Landing = () => {
       </nav>
 
       {/* Hero — sits over the cohesive page backdrop */}
-      <section id="top" className="relative pt-28 sm:pt-32 pb-16">
+      <section id="top" className="relative pt-12 sm:pt-16 pb-16">
         <div className="px-6 sm:px-10 max-w-8xl mx-auto grid lg:grid-cols-2 items-center gap-12 lg:gap-8">
           <motion.div initial={{ opacity: 0, y: 28 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }} className="relative z-10 max-w-xl">
             <span className="inline-flex items-center gap-2 py-1.5 px-3 mb-6 rounded-full border border-accent/40 bg-[color:var(--accent-glow)] text-accent text-xs font-semibold tracking-wide">
