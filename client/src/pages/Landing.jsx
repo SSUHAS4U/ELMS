@@ -141,6 +141,14 @@ const Landing = () => {
 
   return (
     <div className="min-h-dvh bg-base text-content relative overflow-x-hidden font-sans">
+      {/* Cohesive ambient backdrop — spans the whole page, fades softly (no hard edges or side gaps) */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 -z-10" style={{
+        background: `
+          radial-gradient(1000px 560px at 12% 130px, var(--aurora-1), transparent 70%),
+          radial-gradient(820px 480px at 90% 40px, var(--aurora-3), transparent 70%),
+          radial-gradient(1200px 760px at 50% 94%, var(--aurora-2), transparent 75%)`,
+      }} />
+
       {/* Nav */}
       <nav className="fixed top-0 w-full z-50 px-4 sm:px-8 py-3 glass border-b border-line/60 flex justify-between items-center">
         <a href="#top" className="shrink-0"><Logo size={32} wordmark /></a>
@@ -158,8 +166,8 @@ const Landing = () => {
         </div>
       </nav>
 
-      {/* Hero — full-bleed aurora background, centered content */}
-      <section id="top" className="relative bg-aurora pt-28 sm:pt-32 pb-16">
+      {/* Hero — sits over the cohesive page backdrop */}
+      <section id="top" className="relative pt-28 sm:pt-32 pb-16">
         <div className="px-6 sm:px-10 max-w-8xl mx-auto grid lg:grid-cols-2 items-center gap-12 lg:gap-8">
           <motion.div initial={{ opacity: 0, y: 28 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }} className="relative z-10 max-w-xl">
             <span className="inline-flex items-center gap-2 py-1.5 px-3 mb-6 rounded-full border border-accent/40 bg-[color:var(--accent-glow)] text-accent text-xs font-semibold tracking-wide">
