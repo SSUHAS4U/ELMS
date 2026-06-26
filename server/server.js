@@ -94,6 +94,20 @@ app.use((req, res, next) => {
   next(); 
 });
 
+// Lightweight health check for uptime monitors (UptimeRobot, etc.)
+// Placed BEFORE the rate limiter and catch-all so it always responds instantly
+// and never touches the database. Keeps the Render instance warm to avoid cold starts.
+const healthHandler = (req, res) => {
+  res.status(200).json({
+    status: 'ok',
+    uptime: process.uptime(),
+    db: mongoose.connection.readyState === 1 ? 'connected' : 'connecting',
+    timestamp: new Date().toISOString(),
+  });
+};
+app.get('/healthz', healthHandler);
+app.get('/api/health', healthHandler);
+
 // Global API rate limiting
 app.use('/api/', apiLimiter);
 

@@ -48,8 +48,8 @@ const AppShell = () => {
         />
         
         {/* ✅ Only THIS div scrolls, not the whole page */}
-        <main className="flex-1 overflow-y-auto p-6 bg-[color:var(--bg-base)]">
-          <div className="max-w-7xl mx-auto">
+        <main className="flex-1 overflow-y-auto bg-base bg-aurora relative">
+          <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
             <Outlet />
           </div>
         </main>

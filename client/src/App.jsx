@@ -47,10 +47,17 @@ const DashboardRedirect = () => {
   return <Navigate to={`/dashboard/${role}/home`} replace />;
 };
 
-// Full-screen spinner
+// Full-screen branded loader
 const FullScreenLoader = () => (
-  <div className="min-h-screen flex items-center justify-center bg-[color:var(--bg-base)]">
-    <div className="w-8 h-8 border-4 border-[color:var(--accent-primary)] border-t-transparent rounded-full animate-spin"></div>
+  <div className="min-h-dvh flex flex-col items-center justify-center gap-5 bg-base bg-aurora">
+    <div className="relative">
+      <div className="absolute inset-0 rounded-2xl blur-xl opacity-60" style={{ background: 'var(--accent-glow)' }} />
+      <div className="relative w-12 h-12 rounded-2xl grid place-items-center"
+           style={{ background: 'linear-gradient(145deg, var(--accent-bright), var(--accent-muted))', boxShadow: '0 8px 24px -8px var(--accent-glow)' }}>
+        <div className="w-5 h-5 border-2 border-[color:var(--accent-contrast)] border-t-transparent rounded-full animate-spin" />
+      </div>
+    </div>
+    <span className="text-sm text-content-secondary font-medium tracking-wide">Loading Obsidian ELMS…</span>
   </div>
 );
 

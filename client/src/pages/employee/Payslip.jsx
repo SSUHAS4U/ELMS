@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { FileText, Download, ChevronLeft, ChevronRight, Wallet } from 'lucide-react';
+import { FileText, Download, ChevronLeft, ChevronRight, Wallet, TrendingDown, Coins } from 'lucide-react';
 import api from '../../lib/api';
 import useAuthStore from '../../hooks/useAuthStore';
 import { toast } from 'sonner';
+import { PageHeader, Card, Button, EmptyState, Skeleton } from '../../components/ui';
 
-const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+const inr = (v) => `₹${(v || 0).toLocaleString('en-IN')}`;
 
 const Payslip = () => {
   const { user } = useAuthStore();
@@ -22,11 +24,8 @@ const Payslip = () => {
         const res = await api.get(`/payslips/${user._id}?month=${selectedMonth + 1}&year=${selectedYear}`);
         setPayslips(res.data.payslips || []);
       } catch (error) {
-        if (error.response?.status === 404) {
-          setPayslips([]); // endpoint not yet implemented
-        } else {
-          toast.error('Failed to load payslips');
-        }
+        if (error.response?.status === 404) setPayslips([]);
+        else toast.error('Failed to load payslips');
       } finally {
         setLoading(false);
       }
@@ -34,109 +33,82 @@ const Payslip = () => {
     if (user?._id) fetchPayslips();
   }, [user, selectedMonth, selectedYear]);
 
-  const prevMonth = () => {
-    if (selectedMonth === 0) { setSelectedMonth(11); setSelectedYear(y => y - 1); }
-    else setSelectedMonth(m => m - 1);
-  };
-  const nextMonth = () => {
-    if (selectedMonth === 11) { setSelectedMonth(0); setSelectedYear(y => y + 1); }
-    else setSelectedMonth(m => m + 1);
-  };
+  const prevMonth = () => { if (selectedMonth === 0) { setSelectedMonth(11); setSelectedYear((y) => y - 1); } else setSelectedMonth((m) => m - 1); };
+  const nextMonth = () => { if (selectedMonth === 11) { setSelectedMonth(0); setSelectedYear((y) => y + 1); } else setSelectedMonth((m) => m + 1); };
 
-  // Demo payslip structure when no real API exists
   const demoPayslip = {
-    month: MONTHS[selectedMonth],
-    year: selectedYear,
-    grossPay: 75000,
-    netPay: 61200,
-    deductions: { pf: 9000, tax: 3800, insurance: 1000 },
-    earnings: { basic: 45000, hra: 18000, allowances: 12000 }
+    month: MONTHS[selectedMonth], year: selectedYear, grossPay: 75000, netPay: 61200,
+    deductions: { pf: 9000, tax: 3800, insurance: 1000 }, earnings: { basic: 45000, hra: 18000, allowances: 12000 },
   };
-
   const payslip = payslips[0] || (loading ? null : demoPayslip);
+  const totalDeductions = Object.values(payslip?.deductions || {}).reduce((a, b) => a + b, 0);
+
+  const summary = [
+    { icon: Coins, label: 'Gross pay', value: inr(payslip?.grossPay), color: 'var(--info)' },
+    { icon: TrendingDown, label: 'Total deductions', value: inr(totalDeductions), color: 'var(--danger)' },
+    { icon: Wallet, label: 'Net pay', value: inr(payslip?.netPay), color: 'var(--success)' },
+  ];
 
   return (
     <div className="space-y-6 pb-12">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-[color:var(--text-primary)]">Payslips</h1>
-          <p className="text-sm text-[color:var(--text-secondary)] mt-1">View and download your monthly payslips</p>
-        </div>
-      </div>
+      <PageHeader eyebrow="Compensation" title="Payslips" icon={Wallet} subtitle="View and download your monthly payslips." />
 
-      {/* Month Selector */}
-      <div className="flex items-center justify-between bg-[color:var(--bg-surface)] border border-[color:var(--border-subtle)] rounded-xl p-4 shadow-sm">
-        <button onClick={prevMonth} className="p-2 hover:bg-[color:var(--bg-overlay)] rounded-lg transition-colors text-[color:var(--text-secondary)]">
-          <ChevronLeft className="w-5 h-5" />
-        </button>
+      <Card className="flex items-center justify-between p-4">
+        <Button variant="ghost" size="icon" onClick={prevMonth} aria-label="Previous month"><ChevronLeft className="w-5 h-5" /></Button>
         <div className="text-center">
-          <div className="text-lg font-bold text-[color:var(--text-primary)]">{MONTHS[selectedMonth]} {selectedYear}</div>
-          <div className="text-xs text-[color:var(--text-secondary)]">Payslip Period</div>
+          <div className="font-display text-lg font-bold text-content">{MONTHS[selectedMonth]} {selectedYear}</div>
+          <div className="text-xs text-content-secondary uppercase tracking-wider">Payslip period</div>
         </div>
-        <button onClick={nextMonth} className="p-2 hover:bg-[color:var(--bg-overlay)] rounded-lg transition-colors text-[color:var(--text-secondary)]">
-          <ChevronRight className="w-5 h-5" />
-        </button>
-      </div>
+        <Button variant="ghost" size="icon" onClick={nextMonth} aria-label="Next month"><ChevronRight className="w-5 h-5" /></Button>
+      </Card>
 
       {loading ? (
-        <div className="flex justify-center py-16">
-          <div className="w-8 h-8 border-4 border-[color:var(--accent-primary)] border-t-transparent rounded-full animate-spin" />
-        </div>
+        <div className="grid sm:grid-cols-3 gap-4">{[1, 2, 3].map((i) => <Skeleton key={i} className="h-28" />)}</div>
       ) : payslip ? (
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
-          {/* Summary Cards */}
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            {[
-              { label: 'Gross Pay', value: `₹${(payslip.grossPay || 0).toLocaleString('en-IN')}`, color: 'text-[color:var(--info)]' },
-              { label: 'Total Deductions', value: `₹${Object.values(payslip.deductions || {}).reduce((a, b) => a + b, 0).toLocaleString('en-IN')}`, color: 'text-[color:var(--danger)]' },
-              { label: 'Net Pay', value: `₹${(payslip.netPay || 0).toLocaleString('en-IN')}`, color: 'text-[color:var(--success)]' },
-            ].map((s, i) => (
-              <div key={i} className="bg-[color:var(--bg-surface)] border border-[color:var(--border-subtle)] rounded-xl p-5 text-center shadow-sm">
-                <div className={`text-2xl font-black ${s.color}`}>{s.value}</div>
-                <div className="text-sm text-[color:var(--text-secondary)] mt-1">{s.label}</div>
-              </div>
+            {summary.map((s) => (
+              <Card key={s.label} hover className="p-5">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-10 h-10 rounded-[var(--radius-sm)] grid place-items-center" style={{ background: `color-mix(in srgb, ${s.color} 14%, transparent)`, color: s.color }}>
+                    <s.icon className="w-5 h-5" />
+                  </div>
+                  <span className="text-sm text-content-secondary">{s.label}</span>
+                </div>
+                <div className="font-display text-2xl font-bold tabular-nums" style={{ color: s.color }}>{s.value}</div>
+              </Card>
             ))}
           </div>
 
-          {/* Earnings vs Deductions */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="bg-[color:var(--bg-surface)] border border-[color:var(--border-subtle)] rounded-xl overflow-hidden shadow-sm">
-              <div className="px-5 py-3 border-b border-[color:var(--border-subtle)] font-semibold text-[color:var(--text-primary)] flex items-center gap-2">
-                <Wallet className="w-4 h-4 text-[color:var(--success)]" /> Earnings
-              </div>
-              <div className="divide-y divide-[color:var(--border-subtle)]">
+            <Card className="overflow-hidden">
+              <div className="px-5 py-3.5 border-b border-line/60 font-display font-semibold text-content flex items-center gap-2"><Wallet className="w-4 h-4 text-[color:var(--success)]" /> Earnings</div>
+              <div className="divide-y divide-line/60">
                 {Object.entries(payslip.earnings || {}).map(([k, v]) => (
                   <div key={k} className="px-5 py-3 flex justify-between text-sm">
-                    <span className="text-[color:var(--text-secondary)] capitalize">{k.replace(/([A-Z])/g, ' $1')}</span>
-                    <span className="font-semibold text-[color:var(--text-primary)]">₹{v.toLocaleString('en-IN')}</span>
+                    <span className="text-content-secondary capitalize">{k.replace(/([A-Z])/g, ' $1')}</span>
+                    <span className="font-semibold text-content tabular-nums">{inr(v)}</span>
                   </div>
                 ))}
               </div>
-            </div>
-            <div className="bg-[color:var(--bg-surface)] border border-[color:var(--border-subtle)] rounded-xl overflow-hidden shadow-sm">
-              <div className="px-5 py-3 border-b border-[color:var(--border-subtle)] font-semibold text-[color:var(--text-primary)] flex items-center gap-2">
-                <FileText className="w-4 h-4 text-[color:var(--danger)]" /> Deductions
-              </div>
-              <div className="divide-y divide-[color:var(--border-subtle)]">
+            </Card>
+            <Card className="overflow-hidden">
+              <div className="px-5 py-3.5 border-b border-line/60 font-display font-semibold text-content flex items-center gap-2"><FileText className="w-4 h-4 text-[color:var(--danger)]" /> Deductions</div>
+              <div className="divide-y divide-line/60">
                 {Object.entries(payslip.deductions || {}).map(([k, v]) => (
                   <div key={k} className="px-5 py-3 flex justify-between text-sm">
-                    <span className="text-[color:var(--text-secondary)] uppercase text-xs font-medium">{k}</span>
-                    <span className="font-semibold text-[color:var(--danger)]">-₹{v.toLocaleString('en-IN')}</span>
+                    <span className="text-content-secondary uppercase text-xs font-medium">{k}</span>
+                    <span className="font-semibold text-[color:var(--danger)] tabular-nums">-{inr(v)}</span>
                   </div>
                 ))}
               </div>
-            </div>
+            </Card>
           </div>
 
-          <button className="flex items-center gap-2 px-6 py-3 bg-[color:var(--accent-primary)] text-black font-bold rounded-xl hover:bg-[color:var(--accent-muted)] transition-colors shadow-sm">
-            <Download className="w-4 h-4" /> Download PDF
-          </button>
+          <Button><Download className="w-4 h-4" /> Download PDF</Button>
         </motion.div>
       ) : (
-        <div className="text-center py-16 text-[color:var(--text-secondary)]">
-          No payslip found for {MONTHS[selectedMonth]} {selectedYear}
-        </div>
+        <EmptyState icon={Wallet} title="No payslip found" description={`Nothing for ${MONTHS[selectedMonth]} ${selectedYear}.`} />
       )}
     </div>
   );
