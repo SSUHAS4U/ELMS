@@ -6,7 +6,7 @@ import {
   TrendingUp, FileText, Send, Star, Quote,
 } from 'lucide-react';
 import useThemeStore from '../hooks/useThemeStore';
-import { Logo } from '../components/ui';
+import { Logo, AuroraBackground } from '../components/ui';
 import Button from '../components/ui/Button';
 
 const fadeUp = (delay = 0) => ({
@@ -141,13 +141,8 @@ const Landing = () => {
 
   return (
     <div className="min-h-dvh bg-base text-content relative overflow-x-hidden font-sans">
-      {/* Cohesive ambient backdrop — spans the whole page, fades softly (no hard edges or side gaps) */}
-      <div aria-hidden className="pointer-events-none absolute inset-0 -z-10" style={{
-        background: `
-          radial-gradient(1000px 560px at 12% 130px, var(--aurora-1), transparent 70%),
-          radial-gradient(820px 480px at 90% 40px, var(--aurora-3), transparent 70%),
-          radial-gradient(1200px 760px at 50% 94%, var(--aurora-2), transparent 75%)`,
-      }} />
+      {/* Cinematic animated aurora backdrop (21st dev MCP, adapted to emerald theme) */}
+      <AuroraBackground />
 
       {/* Nav */}
       <nav className="fixed top-0 w-full z-50 px-4 sm:px-8 py-3 glass border-b border-line/60 flex justify-between items-center">

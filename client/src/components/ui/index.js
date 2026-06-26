@@ -8,3 +8,4 @@ export { Skeleton, SkeletonCard } from './Skeleton';
 export { Logo } from './Logo';
 export { Modal } from './Modal';
 export { default as HRArtifactScene } from './HRArtifactScene';
+export { AuroraBackground } from './AuroraBackground';
