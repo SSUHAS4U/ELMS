@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { Shield, Filter, ChevronLeft, ChevronRight } from 'lucide-react';
 import api from '../../lib/api';
 import { toast } from 'sonner';
-import { PageHeader, Card, EmptyState, Button, Skeleton } from '../../components/ui';
+import { PageHeader, Card, EmptyState, Button, ResponsiveTable } from '../../components/ui';
 
 const ACTION_TONE = (action) => {
   if (action?.includes('delete') || action?.includes('reject')) return 'text-[color:var(--danger)] bg-[color:var(--danger)]/12';
@@ -41,7 +41,14 @@ const AuditLog = () => {
   };
   useEffect(() => { fetchLogs(); }, [page, actionFilter]);
 
-  const cols = ['Actor', 'Action', 'Description', 'Time'];
+  const columns = [
+    { key: 'actor', header: 'Actor', mobile: 'title', render: (r) => (
+      <div><div className="font-medium text-content">{r.actorName || r.actor?.name}</div><div className="text-xs text-content-secondary capitalize">{r.actor?.role}</div></div>
+    ) },
+    { key: 'action', header: 'Action', mobile: 'trailing', render: (r) => <span className={`text-xs font-mono px-2 py-1 rounded-full ${ACTION_TONE(r.action)}`}>{r.action}</span> },
+    { key: 'desc', header: 'Description', tdClass: 'text-content-secondary max-w-xs truncate', render: (r) => <span title={r.target}>{r.target}</span> },
+    { key: 'time', header: 'Time', tdClass: 'text-content-secondary text-xs tabular-nums', render: (r) => new Date(r.createdAt).toLocaleString('en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }) },
+  ];
 
   return (
     <div className="space-y-6 pb-12">
@@ -59,31 +66,13 @@ const AuditLog = () => {
       </Card>
 
       <Card className="overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm text-left whitespace-nowrap">
-            <thead><tr className="text-content-tertiary border-b border-line/60">
-              {cols.map((h) => <th key={h} className="px-5 py-3 text-[11px] font-semibold uppercase tracking-wider">{h}</th>)}
-            </tr></thead>
-            <tbody>
-              {loading ? (
-                [1, 2, 3, 4, 5].map((i) => <tr key={i} className="border-b border-line/40"><td colSpan={4} className="px-5 py-3"><Skeleton className="h-6 w-full" /></td></tr>)
-              ) : logs.length === 0 ? (
-                <tr><td colSpan={4}><EmptyState icon={Shield} title="No audit entries found" /></td></tr>
-              ) : logs.map((log, i) => (
-                <motion.tr key={log._id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.02 }}
-                  className="border-b border-line/40 last:border-0 hover:bg-overlay/40 transition-colors">
-                  <td className="px-5 py-3.5">
-                    <div className="font-medium text-content">{log.actorName || log.actor?.name}</div>
-                    <div className="text-xs text-content-secondary capitalize">{log.actor?.role}</div>
-                  </td>
-                  <td className="px-5 py-3.5"><span className={`text-xs font-mono px-2 py-1 rounded-full ${ACTION_TONE(log.action)}`}>{log.action}</span></td>
-                  <td className="px-5 py-3.5 text-content-secondary max-w-xs truncate" title={log.target}>{log.target}</td>
-                  <td className="px-5 py-3.5 text-content-secondary text-xs tabular-nums">{new Date(log.createdAt).toLocaleString('en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}</td>
-                </motion.tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <ResponsiveTable
+          columns={columns}
+          data={logs}
+          loading={loading}
+          skeletonRows={5}
+          empty={<EmptyState icon={Shield} title="No audit entries found" />}
+        />
 
         {pages > 1 && (
           <div className="px-5 py-3 border-t border-line/60 flex items-center justify-between text-sm">

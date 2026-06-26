@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { Clock, Download, LogIn, Coffee, Timer, LogOut } from 'lucide-react';
 import api from '../../lib/api';
 import { toast } from 'sonner';
-import { PageHeader, StatCard, Card, Badge, EmptyState, Button, Skeleton } from '../../components/ui';
+import { PageHeader, StatCard, Card, Badge, EmptyState, Button, ResponsiveTable } from '../../components/ui';
 
 const SwipeData = () => {
   const [records, setRecords] = useState([]);
@@ -30,7 +30,16 @@ const SwipeData = () => {
   }, []);
 
   const swipeTone = { present: 'approved', co: 'approved', wfh: 'info', lop: 'rejected' };
-  const cols = ['Date', 'In', 'Out', 'Work', 'Break', 'Reg Hr', 'Status'];
+  const t = (v) => (v ? new Date(v).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '—');
+  const columns = [
+    { key: 'date', header: 'Date', mobile: 'title', tdClass: 'tabular-nums', render: (r) => new Date(r.date).toLocaleDateString('en-GB') },
+    { key: 'in', header: 'In', tdClass: 'tabular-nums', render: (r) => t(r.inTime) },
+    { key: 'out', header: 'Out', tdClass: 'tabular-nums', render: (r) => t(r.outTime) },
+    { key: 'work', header: 'Work', tdClass: 'font-medium', render: (r) => (r.workDuration ? `${Math.floor(r.workDuration / 60)}h ${r.workDuration % 60}m` : '—') },
+    { key: 'break', header: 'Break', tdClass: 'text-content-secondary', render: (r) => (r.breakDuration ? `${r.breakDuration}m` : '—') },
+    { key: 'reg', header: 'Reg Hr', tdClass: 'text-[color:var(--danger)]', render: (r) => r.regularizeHours || '—' },
+    { key: 'status', header: 'Status', mobile: 'trailing', render: (r) => <Badge tone={swipeTone[r.status] || 'neutral'}>{r.status || 'Unknown'}</Badge> },
+  ];
 
   const stats4 = [
     { icon: LogIn, label: 'Avg in time', value: stats.avgInTime },
@@ -57,33 +66,12 @@ const SwipeData = () => {
             <option value="last_month">Last Month</option>
           </select>
         </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm whitespace-nowrap">
-            <thead><tr className="text-content-tertiary border-b border-line/60">
-              {cols.map((c) => <th key={c} className="px-5 py-3 font-semibold text-[11px] tracking-wider uppercase">{c}</th>)}
-            </tr></thead>
-            <tbody>
-              {loading ? (
-                [1, 2, 3, 4].map((i) => <tr key={i} className="border-b border-line/40"><td colSpan={7} className="px-5 py-3"><Skeleton className="h-6 w-full" /></td></tr>)
-              ) : records.length === 0 ? (
-                <tr><td colSpan={7}><EmptyState icon={Clock} title="No swipe records" description="No attendance found for this period." /></td></tr>
-              ) : (
-                records.map((r, i) => (
-                  <motion.tr key={r._id || i} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04 }}
-                    className="border-b border-line/40 last:border-0 hover:bg-overlay/40 transition-colors">
-                    <td className="px-5 py-3.5 tabular-nums">{new Date(r.date).toLocaleDateString('en-GB')}</td>
-                    <td className="px-5 py-3.5 tabular-nums">{r.inTime ? new Date(r.inTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '—'}</td>
-                    <td className="px-5 py-3.5 tabular-nums">{r.outTime ? new Date(r.outTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '—'}</td>
-                    <td className="px-5 py-3.5 font-medium">{r.workDuration ? `${Math.floor(r.workDuration / 60)}h ${r.workDuration % 60}m` : '—'}</td>
-                    <td className="px-5 py-3.5 text-content-secondary">{r.breakDuration ? `${r.breakDuration}m` : '—'}</td>
-                    <td className="px-5 py-3.5 text-[color:var(--danger)]">{r.regularizeHours || '—'}</td>
-                    <td className="px-5 py-3.5"><Badge tone={swipeTone[r.status] || 'neutral'}>{r.status || 'Unknown'}</Badge></td>
-                  </motion.tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
+        <ResponsiveTable
+          columns={columns}
+          data={records}
+          loading={loading}
+          empty={<EmptyState icon={Clock} title="No swipe records" description="No attendance found for this period." />}
+        />
       </Card>
     </div>
   );

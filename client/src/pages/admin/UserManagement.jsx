@@ -5,7 +5,7 @@ import { toast } from 'sonner';
 import api from '../../lib/api';
 import CreateUserModal from '../../components/admin/CreateUserModal';
 import ViewUserModal from '../../components/admin/ViewUserModal';
-import { PageHeader, Card, EmptyState, Button, Skeleton } from '../../components/ui';
+import { PageHeader, Card, EmptyState, Button, ResponsiveTable } from '../../components/ui';
 
 const ROLE_TONE = {
   admin: 'bg-[color:var(--info)]/14 text-[color:var(--info)] border border-[color:var(--info)]/25',
@@ -51,7 +51,35 @@ const UserManagement = () => {
     return users.filter((u) => u.name?.toLowerCase().includes(q) || u.email?.toLowerCase().includes(q) || u.employeeId?.toLowerCase().includes(q) || u.role?.toLowerCase().includes(q));
   }, [users, searchQuery]);
 
-  const cols = ['Employee', 'Contact', 'Role', 'Status', ''];
+  const RowActions = ({ u }) => (
+    <div className="flex justify-end gap-1">
+      <button onClick={() => { setUserToView(u); setViewModalOpen(true); }} title="View details"
+        className="w-8 h-8 grid place-items-center rounded-[var(--radius-sm)] text-content-secondary hover:bg-[color:var(--accent-glow)] hover:text-accent transition-colors"><Eye className="w-4 h-4" /></button>
+      <button onClick={() => { setUserToEdit(u); setModalOpen(true); }} title="Edit user"
+        className="w-8 h-8 grid place-items-center rounded-[var(--radius-sm)] text-content-secondary hover:bg-[color:var(--info)]/10 hover:text-[color:var(--info)] transition-colors"><Edit2 className="w-4 h-4" /></button>
+      {u.role !== 'admin' && (
+        <button onClick={() => handleToggleActive(u._id, u.isActive)} title={u.isActive ? 'Deactivate' : 'Reactivate'}
+          className={`w-8 h-8 grid place-items-center rounded-[var(--radius-sm)] text-content-secondary transition-colors ${u.isActive ? 'hover:bg-[color:var(--danger)]/10 hover:text-[color:var(--danger)]' : 'hover:bg-[color:var(--success)]/10 hover:text-[color:var(--success)]'}`}>
+          {u.isActive ? <CircleSlash className="w-4 h-4" /> : <RotateCcw className="w-4 h-4" />}
+        </button>
+      )}
+    </div>
+  );
+
+  const columns = [
+    { key: 'employee', header: 'Employee', mobile: 'title', render: (u) => (
+      <div className="flex items-center gap-3">
+        <div className="w-9 h-9 rounded-full bg-[color:var(--accent-glow)] grid place-items-center font-bold text-sm text-accent shrink-0">{u.name?.charAt(0) || '?'}</div>
+        <div><p className="font-semibold text-sm text-content">{u.name}</p><p className="text-xs text-content-secondary font-mono">{u.employeeId || '—'}</p></div>
+      </div>
+    ) },
+    { key: 'contact', header: 'Contact', tdClass: 'text-content-secondary', render: (u) => u.email },
+    { key: 'role', header: 'Role', render: (u) => <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${ROLE_TONE[u.role] || ROLE_TONE.employee}`}>{u.role}</span> },
+    { key: 'status', header: 'Status', render: (u) => (
+      <span className="flex items-center gap-2 text-xs font-medium"><span className={`w-2 h-2 rounded-full ${u.isActive ? 'bg-[color:var(--success)]' : 'bg-[color:var(--danger)]'}`} />{u.isActive ? 'Active' : 'Suspended'}</span>
+    ) },
+    { key: 'actions', header: '', align: 'right', mobile: 'trailing', render: (u) => <RowActions u={u} /> },
+  ];
 
   return (
     <div className="space-y-6 pb-12">
@@ -72,57 +100,13 @@ const UserManagement = () => {
           <h2 className="font-display font-semibold text-content">Directory</h2>
           <span className="text-xs font-semibold px-2 py-0.5 rounded-md bg-overlay text-content-secondary">{users.length} members</span>
         </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm">
-            <thead><tr className="text-content-tertiary border-b border-line/60">
-              {cols.map((c, i) => <th key={i} className={`px-5 py-3 font-semibold text-[11px] tracking-wider uppercase ${i === 4 ? 'text-right' : ''}`}>{c}</th>)}
-            </tr></thead>
-            <tbody>
-              {loading ? (
-                [1, 2, 3, 4, 5].map((i) => <tr key={i} className="border-b border-line/40"><td colSpan={5} className="px-5 py-3"><Skeleton className="h-7 w-full" /></td></tr>)
-              ) : filteredUsers.length === 0 ? (
-                <tr><td colSpan={5}><EmptyState icon={Users} title={searchQuery ? `No results for "${searchQuery}"` : 'No users found'} /></td></tr>
-              ) : (
-                filteredUsers.map((u, i) => (
-                  <motion.tr key={u._id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: Math.min(i * 0.03, 0.3) }}
-                    className={`border-b border-line/40 last:border-0 hover:bg-overlay/40 transition-colors ${!u.isActive ? 'opacity-60' : ''}`}>
-                    <td className="px-5 py-3.5">
-                      <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-full bg-[color:var(--accent-glow)] grid place-items-center font-bold text-sm text-accent shrink-0">{u.name?.charAt(0) || '?'}</div>
-                        <div>
-                          <p className="font-semibold text-sm text-content">{u.name}</p>
-                          <p className="text-xs text-content-secondary font-mono">{u.employeeId || '—'}</p>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-5 py-3.5 text-content-secondary">{u.email}</td>
-                    <td className="px-5 py-3.5"><span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${ROLE_TONE[u.role] || ROLE_TONE.employee}`}>{u.role}</span></td>
-                    <td className="px-5 py-3.5">
-                      <span className="flex items-center gap-2 text-xs font-medium">
-                        <span className={`w-2 h-2 rounded-full ${u.isActive ? 'bg-[color:var(--success)]' : 'bg-[color:var(--danger)]'}`} />
-                        {u.isActive ? 'Active' : 'Suspended'}
-                      </span>
-                    </td>
-                    <td className="px-5 py-3.5">
-                      <div className="flex justify-end gap-1">
-                        <button onClick={() => { setUserToView(u); setViewModalOpen(true); }} title="View details"
-                          className="w-8 h-8 grid place-items-center rounded-[var(--radius-sm)] text-content-secondary hover:bg-[color:var(--accent-glow)] hover:text-accent transition-colors"><Eye className="w-4 h-4" /></button>
-                        <button onClick={() => { setUserToEdit(u); setModalOpen(true); }} title="Edit user"
-                          className="w-8 h-8 grid place-items-center rounded-[var(--radius-sm)] text-content-secondary hover:bg-[color:var(--info)]/10 hover:text-[color:var(--info)] transition-colors"><Edit2 className="w-4 h-4" /></button>
-                        {u.role !== 'admin' && (
-                          <button onClick={() => handleToggleActive(u._id, u.isActive)} title={u.isActive ? 'Deactivate' : 'Reactivate'}
-                            className={`w-8 h-8 grid place-items-center rounded-[var(--radius-sm)] text-content-secondary transition-colors ${u.isActive ? 'hover:bg-[color:var(--danger)]/10 hover:text-[color:var(--danger)]' : 'hover:bg-[color:var(--success)]/10 hover:text-[color:var(--success)]'}`}>
-                            {u.isActive ? <CircleSlash className="w-4 h-4" /> : <RotateCcw className="w-4 h-4" />}
-                          </button>
-                        )}
-                      </div>
-                    </td>
-                  </motion.tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
+        <ResponsiveTable
+          columns={columns}
+          data={filteredUsers}
+          loading={loading}
+          skeletonRows={5}
+          empty={<EmptyState icon={Users} title={searchQuery ? `No results for "${searchQuery}"` : 'No users found'} />}
+        />
       </Card>
 
       <CreateUserModal isOpen={modalOpen} onClose={() => { setModalOpen(false); setUserToEdit(null); }} onSuccess={fetchUsers} userToEdit={userToEdit} users={users} />

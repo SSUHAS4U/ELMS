@@ -9,3 +9,4 @@ export { Logo } from './Logo';
 export { Modal } from './Modal';
 export { default as HRArtifactScene } from './HRArtifactScene';
 export { AuroraBackground } from './AuroraBackground';
+export { ResponsiveTable } from './ResponsiveTable';

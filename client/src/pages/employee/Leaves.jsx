@@ -5,7 +5,7 @@ import api from '../../lib/api';
 import useAuthStore from '../../hooks/useAuthStore';
 import ApplyLeaveModal from '../../components/leaves/ApplyLeaveModal';
 import { toast } from 'sonner';
-import { PageHeader, StatCard, Card, Badge, EmptyState, Button, Skeleton } from '../../components/ui';
+import { PageHeader, StatCard, Card, Badge, EmptyState, Button, ResponsiveTable } from '../../components/ui';
 
 const EmployeeLeaves = () => {
   const { user } = useAuthStore();
@@ -42,7 +42,16 @@ const EmployeeLeaves = () => {
     { icon: Clock, label: 'Pending', value: leaves.filter((l) => l.status === 'pending').length },
   ];
 
-  const cols = ['Type', 'From', 'To', 'Days', 'Status', 'Reason', 'Approver'];
+  const d = (v) => new Date(v).toLocaleDateString('en-GB');
+  const columns = [
+    { key: 'type', header: 'Type', mobile: 'title', render: (r) => <span className="capitalize">{r.leaveType}</span> },
+    { key: 'from', header: 'From', tdClass: 'text-content-secondary tabular-nums', render: (r) => d(r.startDate) },
+    { key: 'to', header: 'To', tdClass: 'text-content-secondary tabular-nums', render: (r) => d(r.endDate) },
+    { key: 'days', header: 'Days', tdClass: 'font-semibold tabular-nums', render: (r) => r.numberOfDays },
+    { key: 'status', header: 'Status', mobile: 'trailing', render: (r) => <Badge status={r.status} /> },
+    { key: 'reason', header: 'Reason', tdClass: 'text-content-secondary max-w-[200px] truncate', render: (r) => <span title={r.reason}>{r.reason}</span> },
+    { key: 'approver', header: 'Approver', tdClass: 'text-content-secondary', render: (r) => r.applyTo?.name || '—' },
+  ];
 
   return (
     <div className="space-y-6 pb-12">
@@ -63,38 +72,13 @@ const EmployeeLeaves = () => {
           <CalendarRange className="w-4 h-4 text-accent" />
           <h2 className="font-display font-semibold text-content">Leave history</h2>
         </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm whitespace-nowrap">
-            <thead>
-              <tr className="text-content-tertiary border-b border-line/60">
-                {cols.map((c) => <th key={c} className="px-5 py-3 font-semibold text-[11px] tracking-wider uppercase">{c}</th>)}
-              </tr>
-            </thead>
-            <tbody>
-              {loading ? (
-                [1, 2, 3, 4].map((i) => (
-                  <tr key={i} className="border-b border-line/40"><td colSpan={7} className="px-5 py-3"><Skeleton className="h-6 w-full" /></td></tr>
-                ))
-              ) : leaves.length === 0 ? (
-                <tr><td colSpan={7}><EmptyState icon={CalendarRange} title="No leave requests yet" description='Click "Apply leave" to submit your first request.'
-                  action={<Button size="sm" onClick={() => setModalOpen(true)}><Plus className="w-4 h-4" /> Apply leave</Button>} /></td></tr>
-              ) : (
-                leaves.map((leave, i) => (
-                  <motion.tr key={leave._id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04 }}
-                    className="border-b border-line/40 last:border-0 hover:bg-overlay/40 transition-colors">
-                    <td className="px-5 py-3.5 font-medium capitalize text-content">{leave.leaveType}</td>
-                    <td className="px-5 py-3.5 text-content-secondary tabular-nums">{new Date(leave.startDate).toLocaleDateString('en-GB')}</td>
-                    <td className="px-5 py-3.5 text-content-secondary tabular-nums">{new Date(leave.endDate).toLocaleDateString('en-GB')}</td>
-                    <td className="px-5 py-3.5 font-semibold tabular-nums">{leave.numberOfDays}</td>
-                    <td className="px-5 py-3.5"><Badge status={leave.status} /></td>
-                    <td className="px-5 py-3.5 text-content-secondary max-w-[200px] truncate" title={leave.reason}>{leave.reason}</td>
-                    <td className="px-5 py-3.5 text-content-secondary">{leave.applyTo?.name || '—'}</td>
-                  </motion.tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
+        <ResponsiveTable
+          columns={columns}
+          data={leaves}
+          loading={loading}
+          empty={<EmptyState icon={CalendarRange} title="No leave requests yet" description='Click "Apply leave" to submit your first request.'
+            action={<Button size="sm" onClick={() => setModalOpen(true)}><Plus className="w-4 h-4" /> Apply leave</Button>} />}
+        />
       </Card>
 
       <ApplyLeaveModal isOpen={modalOpen} onClose={() => setModalOpen(false)} onSuccess={fetchLeaves} managers={managers} />

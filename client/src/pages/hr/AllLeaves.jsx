@@ -37,7 +37,19 @@ const AllLeaves = () => {
   const filtered = search && Array.isArray(leaves)
     ? leaves.filter((l) => l.employee?.name?.toLowerCase().includes(search.toLowerCase()))
     : Array.isArray(leaves) ? leaves : [];
-  const cols = ['Employee', 'Type', 'From', 'To', 'Days', 'Status', 'Applied', 'Manager'];
+  const d = (v) => new Date(v).toLocaleDateString('en-GB');
+  const columns = [
+    { key: 'employee', header: 'Employee', mobile: 'title', render: (r) => (
+      <div><div className="font-medium text-content">{r.employee?.name}</div><div className="text-xs text-content-secondary truncate">{r.employee?.email}</div></div>
+    ) },
+    { key: 'type', header: 'Type', tdClass: 'capitalize font-medium', render: (r) => r.leaveType },
+    { key: 'from', header: 'From', tdClass: 'tabular-nums', render: (r) => d(r.startDate) },
+    { key: 'to', header: 'To', tdClass: 'tabular-nums', render: (r) => d(r.endDate) },
+    { key: 'days', header: 'Days', tdClass: 'font-semibold tabular-nums', render: (r) => r.numberOfDays },
+    { key: 'status', header: 'Status', mobile: 'trailing', render: (r) => <Badge status={r.status} /> },
+    { key: 'applied', header: 'Applied', tdClass: 'text-content-secondary tabular-nums', render: (r) => d(r.createdAt) },
+    { key: 'manager', header: 'Manager', tdClass: 'text-content-secondary', render: (r) => r.applyTo?.name || '—' },
+  ];
 
   return (
     <div className="space-y-6 pb-12">
@@ -59,52 +71,16 @@ const AllLeaves = () => {
       </Card>
 
       <Card className="overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm text-left whitespace-nowrap">
-            <thead><tr className="text-content-tertiary border-b border-line/60">
-              {cols.map((h) => <th key={h} className="px-5 py-3 text-[11px] font-semibold uppercase tracking-wider">{h}</th>)}
-            </tr></thead>
-            <tbody>
-              {loading ? (
-                [1, 2, 3, 4, 5].map((i) => <tr key={i} className="border-b border-line/40"><td colSpan={8} className="px-5 py-3"><Skeleton className="h-6 w-full" /></td></tr>)
-              ) : filtered.length === 0 ? (
-                <tr><td colSpan={8}><EmptyState icon={ListTodo} title="No leave records found" /></td></tr>
-              ) : filtered.map((leave, i) => (
-                <React.Fragment key={leave._id}>
-                  <motion.tr initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.025 }}
-                    onClick={() => setExpandedId(expandedId === leave._id ? null : leave._id)}
-                    className={`cursor-pointer border-b border-line/40 transition-colors ${expandedId === leave._id ? 'bg-overlay/60' : 'hover:bg-overlay/40'}`}>
-                    <td className="px-5 py-3.5">
-                      <div className="flex items-center gap-3">
-                        <span className="text-content-tertiary">{expandedId === leave._id ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}</span>
-                        <div>
-                          <div className="font-medium text-content">{leave.employee?.name}</div>
-                          <div className="text-xs text-content-secondary">{leave.employee?.email}</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-5 py-3.5 capitalize font-medium">{leave.leaveType}</td>
-                    <td className="px-5 py-3.5 tabular-nums">{new Date(leave.startDate).toLocaleDateString('en-GB')}</td>
-                    <td className="px-5 py-3.5 tabular-nums">{new Date(leave.endDate).toLocaleDateString('en-GB')}</td>
-                    <td className="px-5 py-3.5 font-semibold tabular-nums">{leave.numberOfDays}</td>
-                    <td className="px-5 py-3.5"><Badge status={leave.status} /></td>
-                    <td className="px-5 py-3.5 text-content-secondary tabular-nums">{new Date(leave.createdAt).toLocaleDateString('en-GB')}</td>
-                    <td className="px-5 py-3.5">{leave.applyTo?.name || '—'}</td>
-                  </motion.tr>
-                  {expandedId === leave._id && (
-                    <motion.tr initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.2 }}>
-                      <td colSpan={8} className="p-0 border-b border-line/40">
-                        <div className="p-6 bg-overlay/30">
-                          <EmployeeMonitoringDetails employeeId={leave.employee?._id} employeeName={leave.employee?.name} />
-                        </div>
-                      </td>
-                    </motion.tr>
-                  )}
-                </React.Fragment>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <ResponsiveTable
+          columns={columns}
+          data={filtered}
+          loading={loading}
+          skeletonRows={5}
+          empty={<EmptyState icon={ListTodo} title="No leave records found" />}
+          onRowClick={(r) => setExpandedId(expandedId === r._id ? null : r._id)}
+          isRowExpanded={(r) => expandedId === r._id}
+          renderExpanded={(r) => <EmployeeMonitoringDetails employeeId={r.employee?._id} employeeName={r.employee?.name} />}
+        />
 
         {total > LIMIT && (
           <div className="px-5 py-3 border-t border-line/60 flex items-center justify-between text-sm">
