@@ -130,7 +130,14 @@ app.get('*', (req, res, next) => {
   if (req.path.startsWith('/api') || req.path.startsWith('/socket.io')) {
     return next();
   }
-  const frontendUrl = process.env.FRONTEND_URL || (process.env.CLIENT_URL ? process.env.CLIENT_URL.split(',')[0].trim() : null) || 'https://obsidianelms.netlify.app';
+  // Prefer an explicit FRONTEND_URL; otherwise pick the first PRODUCTION origin
+  // from CLIENT_URL (skip localhost so we never redirect real users to a dev URL),
+  // falling back to the known Netlify deployment.
+  const clientOrigins = (process.env.CLIENT_URL || '').split(',').map((u) => u.trim()).filter(Boolean);
+  const frontendUrl =
+    process.env.FRONTEND_URL ||
+    clientOrigins.find((u) => !u.includes('localhost') && !u.includes('127.0.0.1')) ||
+    'https://obsidianelms.netlify.app';
   res.redirect(`${frontendUrl}${req.originalUrl}`);
 });
 
