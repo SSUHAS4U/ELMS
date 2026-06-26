@@ -36,7 +36,7 @@ const Approvals = () => {
   const filtered = leaves.filter((l) => l.employee?.name?.toLowerCase().includes(query.toLowerCase()));
   const d = (v) => new Date(v).toLocaleDateString('en-GB');
 
-  const ActionButtons = ({ leave }) => (
+  const actionButtons = (leave) => (
     <div className="flex justify-end gap-2">
       <button onClick={() => handleAction(leave._id, 'approve')} aria-label="Approve"
         className="w-9 h-9 grid place-items-center rounded-[var(--radius-sm)] text-[color:var(--success)] bg-[color:var(--success)]/12 hover:bg-[color:var(--success)] hover:text-[color:var(--accent-contrast)] transition-colors"><Check className="w-4 h-4" /></button>
@@ -58,7 +58,7 @@ const Approvals = () => {
     { key: 'to', header: 'To', tdClass: 'tabular-nums', render: (r) => d(r.endDate) },
     { key: 'days', header: 'Days', tdClass: 'font-semibold tabular-nums', render: (r) => r.numberOfDays },
     { key: 'reason', header: 'Reason', tdClass: 'text-content-secondary max-w-xs truncate', render: (r) => <span title={r.reason}>{r.reason}</span> },
-    { key: 'actions', header: '', align: 'right', mobile: 'trailing', render: (r) => <ActionButtons leave={r} /> },
+    { key: 'actions', header: '', align: 'right', mobile: 'trailing', render: (r) => actionButtons(r) },
   ];
 
   return (

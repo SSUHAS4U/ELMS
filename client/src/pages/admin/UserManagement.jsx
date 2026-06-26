@@ -51,7 +51,7 @@ const UserManagement = () => {
     return users.filter((u) => u.name?.toLowerCase().includes(q) || u.email?.toLowerCase().includes(q) || u.employeeId?.toLowerCase().includes(q) || u.role?.toLowerCase().includes(q));
   }, [users, searchQuery]);
 
-  const RowActions = ({ u }) => (
+  const rowActions = (u) => (
     <div className="flex justify-end gap-1">
       <button onClick={() => { setUserToView(u); setViewModalOpen(true); }} title="View details"
         className="w-8 h-8 grid place-items-center rounded-[var(--radius-sm)] text-content-secondary hover:bg-[color:var(--accent-glow)] hover:text-accent transition-colors"><Eye className="w-4 h-4" /></button>
@@ -78,7 +78,7 @@ const UserManagement = () => {
     { key: 'status', header: 'Status', render: (u) => (
       <span className="flex items-center gap-2 text-xs font-medium"><span className={`w-2 h-2 rounded-full ${u.isActive ? 'bg-[color:var(--success)]' : 'bg-[color:var(--danger)]'}`} />{u.isActive ? 'Active' : 'Suspended'}</span>
     ) },
-    { key: 'actions', header: '', align: 'right', mobile: 'trailing', render: (u) => <RowActions u={u} /> },
+    { key: 'actions', header: '', align: 'right', mobile: 'trailing', render: (u) => rowActions(u) },
   ];
 
   return (

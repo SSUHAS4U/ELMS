@@ -4,7 +4,7 @@ import { Search, ChevronDown, ChevronUp, ListTodo } from 'lucide-react';
 import api from '../../lib/api';
 import { toast } from 'sonner';
 import EmployeeMonitoringDetails from '../../components/hr/EmployeeMonitoringDetails';
-import { PageHeader, Card, Badge, EmptyState, Button, Skeleton } from '../../components/ui';
+import { PageHeader, Card, Badge, EmptyState, Button, ResponsiveTable } from '../../components/ui';
 
 const AllLeaves = () => {
   const [leaves, setLeaves] = useState([]);
