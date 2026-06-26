@@ -48,8 +48,8 @@ export function AuroraBackground({ className }) {
         }}
       />
 
-      {/* edge vignette toward base so glow never hits a hard edge */}
-      <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse 120% 80% at 50% 25%, transparent 40%, var(--bg-base) 100%)' }} />
+      {/* gentle edge vignette toward base so glow fades softly (never a hard edge) */}
+      <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse 130% 95% at 50% 28%, transparent 60%, var(--bg-base) 100%)' }} />
     </div>
   );
 }

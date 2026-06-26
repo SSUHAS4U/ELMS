@@ -140,8 +140,10 @@ const Landing = () => {
   const navLinks = [['Features', '#features'], ['How it works', '#how'], ['Roles', '#roles']];
 
   return (
-    <div className="min-h-dvh bg-base text-content relative overflow-x-hidden font-sans">
-      {/* Cinematic animated aurora backdrop (21st dev MCP, adapted to emerald theme) */}
+    <div className="min-h-dvh bg-base text-content relative isolate overflow-x-hidden font-sans">
+      {/* Cinematic animated aurora backdrop (21st dev MCP, adapted to emerald theme).
+          `isolate` on this root makes it a stacking context so the -z-10 layer paints
+          above bg-base (not hidden behind it). */}
       <AuroraBackground />
 
       {/* Nav */}
