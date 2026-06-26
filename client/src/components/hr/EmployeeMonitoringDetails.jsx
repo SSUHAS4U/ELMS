@@ -33,7 +33,7 @@ const EmployeeMonitoringDetails = ({ employeeId, employeeName }) => {
 
   if (loading) return (
     <div className="space-y-5">
-      <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-5 gap-3">{Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-24" />)}</div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3">{Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-24" />)}</div>
       <Skeleton className="h-[320px]" />
     </div>
   );
@@ -57,7 +57,7 @@ const EmployeeMonitoringDetails = ({ employeeId, employeeName }) => {
       </div>
 
       <div className="space-y-5">
-        <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-5 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3">
           {stats.map((item, idx) => {
             const total = item.used + item.remaining || 1;
             return (
