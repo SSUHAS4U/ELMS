@@ -147,7 +147,8 @@ const Landing = () => {
       <AuroraBackground />
 
       {/* Nav */}
-      <nav className="fixed top-0 w-full z-50 px-4 sm:px-8 py-3 glass border-b border-line/60 flex justify-between items-center">
+      <nav className="fixed inset-x-0 top-0 z-50 px-4 sm:px-8 py-3 border-b border-line/60 backdrop-blur-xl flex justify-between items-center"
+        style={{ background: 'color-mix(in srgb, var(--bg-surface) 82%, transparent)' }}>
         <a href="#top" className="shrink-0"><Logo size={32} wordmark /></a>
         <div className="hidden md:flex items-center gap-1">
           {navLinks.map(([label, href]) => (
