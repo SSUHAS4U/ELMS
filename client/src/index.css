@@ -115,6 +115,10 @@
     border-color: var(--border-subtle);
   }
 
+  html {
+    scroll-behavior: smooth;
+  }
+
   body {
     background-color: var(--bg-base);
     color: var(--text-primary);

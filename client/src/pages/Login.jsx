@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import useAuthStore from '../hooks/useAuthStore';
 import useThemeStore from '../hooks/useThemeStore';
 import {
-  Mail, Lock, ArrowRight, Moon, Sun, CheckCircle2, ShieldCheck, AlertCircle,
+  Mail, Lock, ArrowRight, ArrowLeft, Moon, Sun, CheckCircle2, ShieldCheck, AlertCircle,
   CalendarCheck, Users, Clock, Plane, TrendingUp, Sparkles,
 } from 'lucide-react';
 import { toast } from 'sonner';
@@ -50,7 +50,7 @@ const Showcase = () => (
     <div className="relative z-10 h-full flex flex-col justify-between p-12">
       {/* top: brand */}
       <div className="flex items-center justify-between">
-        <Logo size={38} wordmark />
+        <Link to="/" className="transition-opacity hover:opacity-80" aria-label="Back to home"><Logo size={38} wordmark /></Link>
         <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-accent/30 bg-[color:var(--accent-glow)] text-accent text-[11px] font-semibold">
           <Sparkles className="w-3 h-3" /> v2.0
         </span>
@@ -171,13 +171,17 @@ const Login = () => {
         {/* subtle ambient glow on form side */}
         <div className="pointer-events-none absolute -top-24 -right-24 w-80 h-80 rounded-full blur-3xl opacity-50" style={{ background: 'var(--accent-glow)' }} />
 
+        {/* top bar: back-to-home + theme toggle */}
+        <Link to="/" className="absolute top-6 left-6 inline-flex items-center gap-1.5 text-sm font-medium text-content-secondary hover:text-accent transition-colors z-10">
+          <ArrowLeft className="w-4 h-4" /> Back to home
+        </Link>
         <button onClick={toggle} aria-label="Toggle theme"
           className="absolute top-6 right-6 w-10 h-10 grid place-items-center rounded-full border border-line hover:bg-overlay text-content-secondary hover:text-content transition-colors z-10">
           {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
         </button>
 
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="w-full max-w-[24rem] relative z-10">
-          <div className="lg:hidden mb-8 flex justify-center"><Logo size={40} wordmark /></div>
+          <Link to="/" className="lg:hidden mb-8 flex justify-center" aria-label="Back to home"><Logo size={40} wordmark /></Link>
 
           <div className="mb-7">
             <span className="inline-flex items-center gap-1.5 px-2.5 py-1 mb-4 rounded-full bg-[color:var(--accent-glow)] text-accent text-[11px] font-semibold">
