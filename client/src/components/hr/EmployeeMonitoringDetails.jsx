@@ -31,7 +31,12 @@ const EmployeeMonitoringDetails = ({ employeeId, employeeName }) => {
     fetchStats();
   }, [employeeId]);
 
-  if (loading) return <div className="grid lg:grid-cols-4 gap-6"><Skeleton className="h-64 lg:col-span-1" /><Skeleton className="h-64 lg:col-span-3" /></div>;
+  if (loading) return (
+    <div className="space-y-5">
+      <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-5 gap-3">{Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-24" />)}</div>
+      <Skeleton className="h-[320px]" />
+    </div>
+  );
   if (stats.length === 0) return <EmptyState icon={TrendingUp} title="No leave metrics" description="No data available for this cycle." className="py-10" />;
 
   return (
@@ -51,12 +56,12 @@ const EmployeeMonitoringDetails = ({ employeeId, employeeName }) => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        <div className="lg:col-span-1 space-y-3">
+      <div className="space-y-5">
+        <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-5 gap-3">
           {stats.map((item, idx) => {
             const total = item.used + item.remaining || 1;
             return (
-              <motion.div key={item.type} initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: idx * 0.08 }}
+              <motion.div key={item.type} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: idx * 0.06 }}
                 className="card-surface p-4 relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-1 h-full" style={{ backgroundColor: COLORS[idx % COLORS.length] }} />
                 <div className="text-[10px] uppercase font-bold tracking-widest text-content-tertiary mb-1">{item.type}</div>
@@ -73,7 +78,7 @@ const EmployeeMonitoringDetails = ({ employeeId, employeeName }) => {
           })}
         </div>
 
-        <div className="lg:col-span-3 h-[320px] card-surface p-6 relative overflow-hidden">
+        <div className="h-[320px] card-surface p-6 relative overflow-hidden">
           {activeTab === 'bar' ? (
             <motion.div key="bar" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="w-full h-full">
               <ResponsiveContainer width="99%" height="100%" minHeight={280}>
