@@ -117,6 +117,7 @@
 
   html {
     scroll-behavior: smooth;
+    overflow-x: hidden; /* lets full-viewport fixed elements sit under the scrollbar without causing horizontal scroll */
   }
 
   body {
