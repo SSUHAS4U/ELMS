@@ -158,9 +158,9 @@ const Landing = () => {
         </div>
       </nav>
 
-      {/* Hero */}
-      <section id="top" className="relative pt-28 sm:pt-32 pb-16 px-6 sm:px-10 max-w-8xl mx-auto bg-aurora">
-        <div className="grid lg:grid-cols-2 items-center gap-12 lg:gap-8">
+      {/* Hero — full-bleed aurora background, centered content */}
+      <section id="top" className="relative bg-aurora pt-28 sm:pt-32 pb-16">
+        <div className="px-6 sm:px-10 max-w-8xl mx-auto grid lg:grid-cols-2 items-center gap-12 lg:gap-8">
           <motion.div initial={{ opacity: 0, y: 28 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }} className="relative z-10 max-w-xl">
             <span className="inline-flex items-center gap-2 py-1.5 px-3 mb-6 rounded-full border border-accent/40 bg-[color:var(--accent-glow)] text-accent text-xs font-semibold tracking-wide">
               <Sparkles className="w-3.5 h-3.5" /> v2.0 · Production Ready
